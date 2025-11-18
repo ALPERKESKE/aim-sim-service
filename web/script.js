@@ -386,8 +386,13 @@ async function displayMessagesSequentially(responses) {
 }
 
 async function playAudioQueue(queue) {
-    if (queue.length === 0) return;
+    if (queue.length === 0) {
+        console.log('✅ Tüm sesler çalındı');
+        return;
+    }
+    
     const item = queue.shift();
+    console.log(`🔊 Ses çalınıyor: ${item.speaker} - "${item.text.substring(0, 50)}..."`);
     
     try {
         const audioResponse = await fetch('/api/tts', {
@@ -400,15 +405,36 @@ async function playAudioQueue(queue) {
             const audioBlob = await audioResponse.blob();
             const audioUrl = URL.createObjectURL(audioBlob);
             const audio = new Audio(audioUrl);
-            audio.onended = () => { playAudioQueue(queue); };
+            
+            // Ses bittiğinde bir sonrakine geç
+            audio.onended = () => {
+                console.log(`✅ ${item.speaker} sesi bitti, sıradakine geçiliyor`);
+                URL.revokeObjectURL(audioUrl); // Memory temizliği
+                playAudioQueue(queue);
+            };
+            
+            // Hata durumunda da devam et
+            audio.onerror = (e) => {
+                console.error(`❌ Ses çalma hatası (${item.speaker}):`, e);
+                URL.revokeObjectURL(audioUrl);
+                playAudioQueue(queue);
+            };
+            
+            // Ses hazır olduğunda çal
             audio.addEventListener('canplaythrough', () => {
-                setTimeout(() => { audio.play().catch(e => console.error(e)); }, 50); 
+                audio.play().catch(e => {
+                    console.error(`❌ Ses oynatma hatası (${item.speaker}):`, e);
+                    playAudioQueue(queue);
+                });
             }, { once: true });
+            
             audio.load();
         } else {
+            console.error(`❌ TTS API hatası: ${audioResponse.status}`);
             playAudioQueue(queue);
         }
     } catch (e) {
+        console.error(`❌ TTS istek hatası:`, e);
         playAudioQueue(queue);
     }
 }
