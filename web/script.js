@@ -134,7 +134,7 @@ async function startScenarioConversation() {
 
     try {
         const triggerMessage = "[SYSTEM: User joined. Start immediately as character. German.]";
-        const response = await fetch('http://127.0.0.1:8000/simulate', {
+        const response = await fetch('/simulate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ user_message: triggerMessage, history: [], scenario_id: currentScenario }),
@@ -163,7 +163,7 @@ async function sendMessage() {
     conversationHistory.push({ role: 'user', parts: [{ text: message }] });
 
     try {
-        const response = await fetch('http://127.0.0.1:8000/simulate', {
+        const response = await fetch('/simulate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ user_message: message, history: conversationHistory, scenario_id: currentScenario }),
@@ -208,7 +208,7 @@ async function playAudioQueue(queue) {
     const item = queue.shift();
     
     try {
-        const audioResponse = await fetch('http://127.0.0.1:8000/api/tts', {
+        const audioResponse = await fetch('/api/tts', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ text: item.text, speaker: item.speaker })
