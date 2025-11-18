@@ -367,11 +367,24 @@ async function displayMessagesSequentially(responses) {
     for (let i = 0; i < responses.length; i++) {
         const aiResponse = responses[i];
         
-        // Mesajı göster
-        appendMessage(aiResponse.text, 'agent', aiResponse.speaker);
+        // Speaker adını normalize et (ilk harf büyük, geri kalan küçük)
+        let speakerName = aiResponse.speaker?.trim() || 'System';
+        // İlk harfi büyük yap
+        speakerName = speakerName.charAt(0).toUpperCase() + speakerName.slice(1).toLowerCase();
         
-        // Ses kuyruğuna ekle
-        audioQueue.push({ text: aiResponse.text, speaker: aiResponse.speaker });
+        // Seçilen üyelerle eşleştir (büyük/küçük harf duyarsız)
+        const matchedMember = selectedMembers.find(m => m.toLowerCase() === speakerName.toLowerCase());
+        if (matchedMember) {
+            speakerName = matchedMember; // Orijinal formatta kullan (örn: "Lukas")
+        }
+        
+        console.log(`📝 Mesaj gösteriliyor: ${speakerName} - "${aiResponse.text.substring(0, 50)}..."`);
+        
+        // Mesajı göster
+        appendMessage(aiResponse.text, 'agent', speakerName);
+        
+        // Ses kuyruğuna ekle (normalize edilmiş speaker adı ile)
+        audioQueue.push({ text: aiResponse.text, speaker: speakerName });
         
         // Son mesaj değilse, bir sonraki mesajdan önce kısa bir bekleme
         if (i < responses.length - 1) {
@@ -381,6 +394,7 @@ async function displayMessagesSequentially(responses) {
     
     // Tüm mesajlar gösterildikten sonra sesleri çal
     if (audioQueue.length > 0) {
+        console.log(`🎵 Ses kuyruğu hazırlandı: ${audioQueue.map(q => q.speaker).join(', ')}`);
         playAudioQueue(audioQueue);
     }
 }
@@ -392,13 +406,18 @@ async function playAudioQueue(queue) {
     }
     
     const item = queue.shift();
-    console.log(`🔊 Ses çalınıyor: ${item.speaker} - "${item.text.substring(0, 50)}..."`);
+    
+    // Speaker adını kesinlikle doğru formatta gönder (ilk harf büyük)
+    const speakerName = item.speaker?.charAt(0).toUpperCase() + item.speaker?.slice(1).toLowerCase() || 'System';
+    
+    console.log(`🔊 Ses çalınıyor: ${speakerName} (orijinal: ${item.speaker}) - "${item.text.substring(0, 50)}..."`);
+    console.log(`📤 TTS API'ye gönderilen speaker: "${speakerName}"`);
     
     try {
         const audioResponse = await fetch('/api/tts', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text: item.text, speaker: item.speaker })
+            body: JSON.stringify({ text: item.text, speaker: speakerName })
         });
 
         if (audioResponse.ok) {

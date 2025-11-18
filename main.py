@@ -126,8 +126,13 @@ async def run_simulation(request: SimulationRequest):
 @app.post("/api/tts")
 async def text_to_speech(request: TTSRequest):
     try:
+        # Speaker adını normalize et (ilk harf büyük)
+        speaker_normalized = request.speaker.strip().capitalize() if request.speaker else "System"
+        print(f"🎤 TTS İsteği: '{request.speaker}' -> normalize: '{speaker_normalized}'")
+        
         # Ses ID'sini bul
-        voice_id = VOICE_MAP.get(request.speaker, VOICE_MAP["System"])
+        voice_id = VOICE_MAP.get(speaker_normalized, VOICE_MAP["System"])
+        print(f"🔊 Kullanılan Voice ID: {voice_id} ({speaker_normalized})")
         
         # OPTİMİZASYON 1: Gecikmeyi düşür (latency=3 denge için iyidir)
         url = f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}?optimize_streaming_latency=3"
@@ -147,19 +152,19 @@ async def text_to_speech(request: TTSRequest):
         }
         
         # Sarah için: Daha hızlı ve net konuşma (stability düşük = daha hızlı)
-        if request.speaker == "Sarah":
+        if speaker_normalized == "Sarah":
             voice_settings = {
                 "stability": 0.3,  # Daha düşük = daha hızlı ve dinamik
                 "similarity_boost": 0.8  # Yüksek = daha net
             }
         # Mark için: Daha casual ve rahat konuşma
-        elif request.speaker == "Mark":
+        elif speaker_normalized == "Mark":
             voice_settings = {
                 "stability": 0.6,  # Biraz daha yüksek = daha rahat
                 "similarity_boost": 0.65  # Biraz daha düşük = daha casual
             }
         # Lukas için: Bavyera lehçesi için özel ayar
-        elif request.speaker == "Lukas":
+        elif speaker_normalized == "Lukas":
             voice_settings = {
                 "stability": 0.55,  # Orta seviye
                 "similarity_boost": 0.75  # Yüksek = daha karakteristik
@@ -179,7 +184,7 @@ async def text_to_speech(request: TTSRequest):
                 print(f"ElevenLabs Hata: {response.text}")
                 raise HTTPException(status_code=500, detail="Ses servisi hatası")
             
-            print(f"🔊 Ses alındı: {request.speaker} ({len(response.content)} bytes)")
+            print(f"🔊 Ses alındı: {speaker_normalized} ({len(response.content)} bytes)")
             return Response(content=response.content, media_type="audio/mpeg")
 
     except Exception as e:
