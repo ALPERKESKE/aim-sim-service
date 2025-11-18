@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meeting Room</title>
+    <link rel="stylesheet" href="style.css"> 
+</head>
+<body>
+    <div id="main-wrapper">
+        
+        <div id="mission-card">
+            <div class="mission-header">
+                <h3 id="mission-title">Yükleniyor...</h3>
+                <button id="end-meeting-btn">Toplantıyı Bitir 🏁</button>
+            </div>
+            
+            <p id="mission-desc">...</p>
+            <div class="hint-box">
+                <h4 style="margin:0 0 10px 0; color:#495057; font-size:0.9rem;">📋 İpuçları:</h4>
+                <ul id="detailed-hints" style="margin:0; padding-left:20px; color:#666; font-size:0.9rem;"></ul>
+            </div>
+        </div>
+
+        <div id="chat-container">
+            <div id="messages"></div>
+            <div id="input-area">
+                <button id="mic-button" class="icon-btn" title="Konuş">🎤</button>
+                <input type="text" id="user-input" placeholder="Mesajını yaz..." autocomplete="off">
+                <button id="send-button">Senden ➤</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="result-modal" style="display: none;">
+        <div class="modal-content">
+            <h2>🎉 Toplantı Sona Erdi!</h2>
+            <p>İşte genel performansın:</p>
+            
+            <div class="big-score-container">
+                <div id="final-grammar" class="score-circle">
+                    <span id="avg-grammar">0</span>%
+                    <span class="score-label">Grammatik</span>
+                </div>
+                <div id="final-vocab" class="score-circle">
+                    <span id="avg-vocab">0</span>%
+                    <span class="score-label">Vokabular</span>
+                </div>
+            </div>
+
+            <div class="feedback-box">
+                <h4>⚠️ Toplanan Hatalar:</h4>
+                <ul id="all-mistakes-list" style="margin:0; padding-left:20px; color:#555;">
+                    <li>Hata yok!</li>
+                </ul>
+            </div>
+
+            <button id="restart-btn">Görev Listesine Dön</button>
+        </div>
+    </div>
+
+    <script type="module" src="script.js"></script>
+</body>
+</html>

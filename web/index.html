@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevOps Simulator - Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <div style="text-align: center; margin-bottom: 20px;">
+            <h1 style="color:#333; margin-bottom: 5px;">Berlin Tech Solutions GmbH</h1>
+            <p style="color:#666;">Bugünkü toplantılarınızı seçin ve ekibi yönetin.</p>
+        </div>
+
+        <h3 style="border-bottom: 2px solid #eee; padding-bottom: 10px;">👥 Ekip Arkadaşların</h3>
+        <div class="team-section">
+            <div class="team-card">
+                <div class="team-avatar thomas-av">T</div>
+                <strong>Thomas (Lead)</strong>
+                <p style="font-size:0.8rem; color:#666;">Sonuç odaklı, biraz stresli. Çözüm istiyor.</p>
+            </div>
+            <div class="team-card">
+                <div class="team-avatar sarah-av">S</div>
+                <strong>Sarah (Senior)</strong>
+                <p style="font-size:0.8rem; color:#666;">Teknik uzman. Detaylara takılır.</p>
+            </div>
+            <div class="team-card">
+                <div class="team-avatar mark-av">M</div>
+                <strong>Mark (PO)</strong>
+                <p style="font-size:0.8rem; color:#666;">Müşteri odaklı. Teknikten anlamaz.</p>
+            </div>
+        </div>
+
+        <h3 style="border-bottom: 2px solid #eee; padding-bottom: 10px;">📋 Bekleyen Toplantılar</h3>
+        <div id="mission-grid" class="mission-grid">
+            </div>
+
+        <div class="start-btn-container">
+            <button id="start-simulation-btn">Toplantıya Katıl ➤</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { SCENARIO_INFO } from './scenarios.js';
+
+        const grid = document.getElementById('mission-grid');
+        const startBtn = document.getElementById('start-simulation-btn');
+        let selectedScenario = null;
+
+        // Senaryoları Ekrana Bas
+        for (const [key, info] of Object.entries(SCENARIO_INFO)) {
+            const card = document.createElement('div');
+            card.className = 'mission-card-select';
+            card.innerHTML = `
+                <h4 style="margin:0 0 5px 0; color:#333;">${info.title}</h4>
+                <p style="font-size:0.9rem; color:#666; margin:0;">${info.desc}</p>
+            `;
+            
+            // Seçim Mantığı
+            card.onclick = () => {
+                // Öncekileri temizle
+                document.querySelectorAll('.mission-card-select').forEach(c => c.classList.remove('active'));
+                // Yeniyi seç
+                card.classList.add('active');
+                selectedScenario = key;
+                startBtn.classList.add('ready');
+                startBtn.innerText = `"${info.title}" Başlat ➤`;
+            };
+            grid.appendChild(card);
+        }
+
+        // Butona Tıklayınca
+        startBtn.onclick = () => {
+            if (selectedScenario) {
+                // Seçilen senaryoyu URL parametresi olarak gönder
+                window.location.href = `simulation.html?scenario=${selectedScenario}`;
+            }
+        };
+    </script>
+</body>
+</html>

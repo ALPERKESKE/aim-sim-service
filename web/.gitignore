@@ -1,0 +1,13 @@
+# Gizli Anahtarlar (BUNU SAKIN SİLME)
+.env
+
+# Python Gereksiz Dosyaları
+__pycache__/
+*.py[cod]
+
+# Sanal Ortam
+venv/
+env/
+
+# Mac Sistem Dosyaları
+.DS_Store

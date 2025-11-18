@@ -1,0 +1,11 @@
+services:
+  app:
+    build: .
+    container_name: business-deutsch-sim
+    restart: always
+    ports:
+      - "8080:8000"  # Dışarıdan 8080 (HTTP) -> İçeriden 8000 (FastAPI)
+    env_file:
+      - .env
+    volumes:
+      - ./web:/app/web # Web klasörünü canlı düzenlemek için (Opsiyonel)
