@@ -519,26 +519,6 @@ async function playAudioQueue(queue) {
             const audioBlob = await audioResponse.blob();
             const audioUrl = URL.createObjectURL(audioBlob);
             const audio = new Audio(audioUrl);
-        } else if (audioResponse.status === 402) {
-            // Quota hatası - ses çalamıyoruz ama devam ediyoruz
-            const errorData = await audioResponse.json().catch(() => ({}));
-            console.warn(`⚠️ ElevenLabs quota hatası: ${errorData.detail || 'Quota exceeded'}`);
-            console.log(`ℹ️ ${speakerName} mesajı gösterildi ama ses çalınamadı (quota doldu)`);
-            isPlayingAudio = false;
-            playAudioQueue(queue); // Devam et
-            return;
-        } else {
-            // Diğer hatalar
-            console.error(`❌ TTS API hatası: ${audioResponse.status}`);
-            isPlayingAudio = false;
-            playAudioQueue(queue);
-            return;
-        }
-        
-        if (audioResponse.ok) {
-            const audioBlob = await audioResponse.blob();
-            const audioUrl = URL.createObjectURL(audioBlob);
-            const audio = new Audio(audioUrl);
             
             // Ses çalma işlemini Promise ile yönet
             await new Promise((resolve, reject) => {
@@ -604,6 +584,13 @@ async function playAudioQueue(queue) {
             
             // Ses bittikten sonra bir sonrakine geç
             playAudioQueue(queue);
+        } else if (audioResponse.status === 402) {
+            // Quota hatası - ses çalamıyoruz ama devam ediyoruz
+            const errorData = await audioResponse.json().catch(() => ({}));
+            console.warn(`⚠️ ElevenLabs quota hatası: ${errorData.detail || 'Quota exceeded'}`);
+            console.log(`ℹ️ ${speakerName} mesajı gösterildi ama ses çalınamadı (quota doldu)`);
+            isPlayingAudio = false;
+            playAudioQueue(queue); // Devam et
         } else {
             console.error(`❌ TTS API hatası: ${audioResponse.status}`);
             isPlayingAudio = false;
