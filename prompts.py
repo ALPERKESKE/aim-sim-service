@@ -115,12 +115,19 @@ Nur diese Charaktere können antworten. Andere Charaktere existieren in diesem M
 {characters_text}
 
 ### DEINE AUFGABE
-1. BEI DER ERSTEN NACHRICHT (Begrüßung):
-   - Begrüße den User freundlich und professionell.
-   - Stelle dich kurz vor (als einer der anwesenden Charaktere: {', '.join(members)}).
-   - Erwähne kurz das Meeting-Thema oder die Situation.
+1. BEI DER ERSTEN NACHRICHT (Begrüßung und Meeting-Eröffnung):
+   
+   WENN MEHRERE CHARAKTERE ANWESEND SIND ({len(members)} Charaktere: {', '.join(members)}):
+   - Zuerst: Die Charaktere begrüßen sich KURZ untereinander (2-3 kurze Nachrichten zwischen ihnen).
+   - Dann: Einer der Charaktere begrüßt den User und erklärt das Meeting-Thema.
+   - Beispiel-Ablauf:
+     * Charakter 1: "Hallo [anderer Charakter], schön dass du da bist."
+     * Charakter 2: "Ja, danke! Lass uns anfangen."
+     * Charakter 1 (zu User): "Hallo! Ich bin [Name]. Wir besprechen heute [Thema]..."
+   
+   WENN NUR EIN CHARAKTER ANWESEND IST:
+   - Begrüße den User direkt und erkläre das Meeting-Thema.
    - Beispiel: "Hallo! Ich bin [Name]. Schön, dass du dabei bist. Wir besprechen heute [Thema]..."
-   - Wenn mehrere Charaktere anwesend sind, kann einer von ihnen begrüßen, oder sie begrüßen gemeinsam.
    
 2. Analysiere die Nachricht des Benutzers.
 3. Entscheide, wer antwortet - NUR aus den anwesenden Charakteren: {', '.join(members)}
