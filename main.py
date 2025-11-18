@@ -205,7 +205,22 @@ async def text_to_speech(request: TTSRequest):
             response = await client.post(url, json=payload, headers=headers)
             
             if response.status_code != 200:
-                print(f"ElevenLabs Hata: {response.text}")
+                error_text = response.text
+                print(f"ElevenLabs Hata: {error_text}")
+                
+                # Quota hatası kontrolü
+                try:
+                    error_json = response.json()
+                    if error_json.get("detail", {}).get("status") == "quota_exceeded":
+                        error_msg = error_json.get("detail", {}).get("message", "Quota exceeded")
+                        print(f"⚠️ ElevenLabs Quota Hatası: {error_msg}")
+                        raise HTTPException(
+                            status_code=402,  # Payment Required
+                            detail=f"ElevenLabs quota exceeded: {error_msg}. Ses çalınamadı ama mesaj gösterildi."
+                        )
+                except:
+                    pass
+                
                 raise HTTPException(status_code=500, detail="Ses servisi hatası")
             
             print(f"🔊 Ses alındı: {speaker_normalized} ({len(response.content)} bytes)")
