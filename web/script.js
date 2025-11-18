@@ -246,7 +246,9 @@ async function startScenarioConversation() {
     try {
         // Başlangıç mesajını seçilen karakterlere göre özelleştir
         const membersList = selectedMembers.join(', ');
-        const triggerMessage = `[SYSTEM: User joined. Start immediately as ONE of these characters: ${membersList}. Choose randomly or based on context. German.]`;
+        // İlk karakteri direkt belirt (daha spesifik)
+        const firstCharacter = selectedMembers[0];
+        const triggerMessage = `[SYSTEM: User joined. You MUST respond as ${firstCharacter} (or another from: ${membersList}). DO NOT use Thomas, Sarah, or any character NOT in this list: ${membersList}. German.]`;
         
         const requestBody = { 
             user_message: triggerMessage, 
