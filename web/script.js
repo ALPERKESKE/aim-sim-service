@@ -262,13 +262,28 @@ if (SpeechRecognition) {
     recognition.continuous = true; 
     recognition.interimResults = true; 
 
-    micButton.addEventListener('click', () => {
+    micButton.addEventListener('click', async () => {
         if (isRecording) {
             recognition.stop();
         } else {
+            // Mikrofon izni kontrolü
+            try {
+                await navigator.mediaDevices.getUserMedia({ audio: true });
+            } catch (error) {
+                alert('Mikrofon izni gerekli. Lütfen tarayıcı ayarlarından mikrofon iznini verin.');
+                console.error('Mikrofon izni hatası:', error);
+                return;
+            }
+            
             textBeforeRecording = userInput.value;
             if (textBeforeRecording.length > 0) textBeforeRecording += " "; 
-            recognition.start();
+            
+            try {
+                recognition.start();
+            } catch (error) {
+                console.error('Speech recognition başlatma hatası:', error);
+                alert('Ses tanıma başlatılamadı. Lütfen tekrar deneyin.');
+            }
         }
     });
 
@@ -276,30 +291,63 @@ if (SpeechRecognition) {
         isRecording = true;
         micButton.classList.add('recording');
         userInput.placeholder = "Dinleniyor...";
+        console.log('Mikrofon aktif');
     };
 
     recognition.onend = () => {
         isRecording = false;
         micButton.classList.remove('recording');
         userInput.placeholder = "Mesajını buraya yaz (Almanca)...";
+        console.log('Mikrofon durduruldu');
     };
 
     recognition.onresult = (event) => {
         let currentSessionTranscript = "";
         for (let i = 0; i < event.results.length; ++i) {
-            currentSessionTranscript += event.results[i][0].transcript;
+            if (event.results[i].isFinal) {
+                currentSessionTranscript += event.results[i][0].transcript;
+            } else {
+                // Geçici sonuçları da göster
+                currentSessionTranscript += event.results[i][0].transcript;
+            }
         }
         userInput.value = textBeforeRecording + currentSessionTranscript;
     };
 
     recognition.onerror = (event) => {
+        console.error('Speech recognition hatası:', event.error);
+        isRecording = false;
+        micButton.classList.remove('recording');
+        userInput.placeholder = "Mesajını buraya yaz (Almanca)...";
+        
+        let errorMessage = '';
+        switch(event.error) {
+            case 'no-speech':
+                errorMessage = 'Konuşma algılanamadı. Tekrar deneyin.';
+                break;
+            case 'audio-capture':
+                errorMessage = 'Mikrofon bulunamadı veya erişilemiyor.';
+                break;
+            case 'not-allowed':
+                errorMessage = 'Mikrofon izni reddedildi. Lütfen tarayıcı ayarlarından izin verin.';
+                break;
+            case 'network':
+                errorMessage = 'Ağ hatası. İnternet bağlantınızı kontrol edin.';
+                break;
+            default:
+                errorMessage = `Ses tanıma hatası: ${event.error}`;
+        }
+        
         if (event.error !== 'no-speech') {
-            isRecording = false;
-            micButton.classList.remove('recording');
+            alert(errorMessage);
         }
     };
 } else {
-    if (micButton) micButton.style.display = 'none';
+    console.warn('Web Speech API desteklenmiyor');
+    if (micButton) {
+        micButton.style.display = 'none';
+        console.log('Mikrofon butonu gizlendi - API desteklenmiyor');
+    }
 }
 
 sendButton.addEventListener('click', sendMessage);
