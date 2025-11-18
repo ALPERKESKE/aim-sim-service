@@ -80,35 +80,36 @@ async def run_simulation(request: SimulationRequest):
         # 5. Response'u parse et ve sadece seçilen karakterlerin konuşmasını filtrele
         parsed_response = json.loads(text_response)
         
-        # Seçilen karakterlerin listesi
-        allowed_speakers = set(request.members)
+        # Seçilen karakterlerin listesi (normalize edilmiş)
+        allowed_speakers = {member.strip().lower() for member in request.members}
         
         # Response'lardaki speaker'ları filtrele
         if "responses" in parsed_response:
             filtered_responses = []
             for resp in parsed_response["responses"]:
-                speaker = resp.get("speaker", "")
-                # Speaker adını normalize et (büyük/küçük harf farkını göz ardı et)
-                speaker_normalized = speaker.strip()
+                speaker = resp.get("speaker", "").strip()
+                speaker_normalized = speaker.lower()
                 
                 # Eğer speaker seçilen listede varsa ekle
-                if any(member.lower() == speaker_normalized.lower() for member in allowed_speakers):
+                if speaker_normalized in allowed_speakers:
+                    # Speaker adını orijinal formatta koru (ilk harf büyük)
+                    resp["speaker"] = next((m for m in request.members if m.lower() == speaker_normalized), speaker)
                     filtered_responses.append(resp)
                 else:
-                    print(f"⚠️ Filtrelenen speaker: {speaker} (Seçilen: {request.members})")
+                    print(f"⚠️ Filtrelenen speaker: '{speaker}' (Seçilen: {request.members})")
             
-            parsed_response["responses"] = filtered_responses
-            
-            # Eğer hiç response kalmadıysa, ilk seçilen karakteri kullan
-            if len(filtered_responses) == 0 and len(allowed_speakers) > 0:
-                first_member = list(allowed_speakers)[0]
-                print(f"⚠️ Hiç geçerli response yok, varsayılan olarak {first_member} kullanılıyor")
-                # Bu durumda AI'ya tekrar sormak yerine, kullanıcıya bilgi ver
-                parsed_response["responses"] = [{
+            # Eğer hiç geçerli response yoksa veya yanlış karakter konuştuysa
+            if len(filtered_responses) == 0:
+                # İlk seçilen karakteri kullan ve AI'ya tekrar sorma
+                first_member = request.members[0]
+                print(f"⚠️ Yanlış karakter konuştu, {first_member} kullanılıyor")
+                filtered_responses = [{
                     "speaker": first_member,
                     "mood": "neutral",
-                    "text": "Entschuldigung, ich habe das nicht richtig verstanden. Können Sie das nochmal erklären?"
+                    "text": f"Hallo! Ich bin {first_member}. Wie kann ich dir helfen?"
                 }]
+            
+            parsed_response["responses"] = filtered_responses
         
         return parsed_response
 

@@ -118,11 +118,12 @@ Nur diese Charaktere können antworten. Andere Charaktere existieren in diesem M
 1. Analysiere die Nachricht des Benutzers.
 2. Entscheide, wer antwortet - NUR aus den anwesenden Charakteren: {', '.join(members)}
 3. Wenn der User das Ziel erreicht, gib positives Feedback ("Gute Arbeit", "Klingt nach einem Plan").
-4. KRITISCH WICHTIG: 
+4. KRITISCH WICHTIG - BU KURALLAR ASLA İHLAL EDİLEMEZ: 
    - Antworte NUR mit Charakteren, die in dieser Liste sind: {', '.join(members)}
-   - Wenn ein Charakter NICHT in dieser Liste ist, darf er NICHT antworten.
-   - Wenn du einen Charakter verwenden willst, der nicht in der Liste ist, wähle stattdessen einen aus der Liste.
-   - Beispiel: Wenn nur "Lukas" in der Liste ist, antworte NUR als Lukas. Thomas, Sarah, Mark existieren in diesem Meeting NICHT.
+   - Wenn ein Charakter NICHT in dieser Liste ist, darf er ABSOLUT NICHT antworten.
+   - Wenn du einen Charakter verwenden willst, der nicht in der Liste ist, wähle stattdessen MUTLAKA einen aus der Liste.
+   - Beispiel: Wenn nur "Lukas" in der Liste ist, antworte NUR als Lukas. Thomas, Sarah, Mark existieren in diesem Meeting NICHT und dürfen NIEMALS antworten.
+   - BEI DER ERSTEN NACHRICHT: Wähle einen Charakter aus dieser Liste: {', '.join(members)}. NICHT Thomas, NICHT Sarah, NICHT Mark, wenn sie nicht in der Liste sind.
 
 ### REGELN
 - Antworte NIEMALS als KI.

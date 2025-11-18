@@ -244,7 +244,10 @@ async function startScenarioConversation() {
     messagesDiv.appendChild(loadingDiv);
 
     try {
-        const triggerMessage = "[SYSTEM: User joined. Start immediately as character. German.]";
+        // Başlangıç mesajını seçilen karakterlere göre özelleştir
+        const membersList = selectedMembers.join(', ');
+        const triggerMessage = `[SYSTEM: User joined. Start immediately as ONE of these characters: ${membersList}. Choose randomly or based on context. German.]`;
+        
         const requestBody = { 
             user_message: triggerMessage, 
             history: [], 
@@ -252,6 +255,7 @@ async function startScenarioConversation() {
             members: selectedMembers 
         };
         console.log('Backend\'e gönderilen request:', requestBody);
+        console.log('Seçilen karakterler:', selectedMembers);
         
         const response = await fetch('/simulate', {
             method: 'POST',
