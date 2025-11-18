@@ -46,6 +46,9 @@ window.onload = function() {
 
     if (membersFromUrl) {
         selectedMembers = membersFromUrl.split(',');
+        console.log('Seçilen ekip üyeleri:', selectedMembers);
+    } else {
+        console.log('URL\'de members parametresi yok, varsayılan kullanılıyor:', selectedMembers);
     }
 
     // 2. KULLANICI ADI GİRİŞİ
@@ -227,15 +230,18 @@ async function startScenarioConversation() {
 
     try {
         const triggerMessage = "[SYSTEM: User joined. Start immediately as character. German.]";
+        const requestBody = { 
+            user_message: triggerMessage, 
+            history: [], 
+            scenario_id: currentScenario,
+            members: selectedMembers 
+        };
+        console.log('Backend\'e gönderilen request:', requestBody);
+        
         const response = await fetch('/simulate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                user_message: triggerMessage, 
-                history: [], 
-                scenario_id: currentScenario,
-                members: selectedMembers 
-            }),
+            body: JSON.stringify(requestBody),
         });
 
         if(document.getElementById(loadingId)) document.getElementById(loadingId).remove();
