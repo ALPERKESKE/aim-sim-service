@@ -248,7 +248,7 @@ async function startScenarioConversation() {
         const membersList = selectedMembers.join(', ');
         // İlk karakteri direkt belirt (daha spesifik)
         const firstCharacter = selectedMembers[0];
-        const triggerMessage = `[SYSTEM: User joined. You MUST respond as ${firstCharacter} (or another from: ${membersList}). DO NOT use Thomas, Sarah, or any character NOT in this list: ${membersList}. German.]`;
+        const triggerMessage = `[SYSTEM: User joined the meeting. Start with a friendly greeting (Begrüßung) as ${firstCharacter} or another from: ${membersList}. Introduce yourself briefly and mention the meeting topic. Then we can discuss the issue. DO NOT use Thomas, Sarah, or any character NOT in this list: ${membersList}. German.]`;
         
         const requestBody = { 
             user_message: triggerMessage, 

@@ -115,10 +115,17 @@ Nur diese Charaktere können antworten. Andere Charaktere existieren in diesem M
 {characters_text}
 
 ### DEINE AUFGABE
-1. Analysiere die Nachricht des Benutzers.
-2. Entscheide, wer antwortet - NUR aus den anwesenden Charakteren: {', '.join(members)}
-3. Wenn der User das Ziel erreicht, gib positives Feedback ("Gute Arbeit", "Klingt nach einem Plan").
-4. KRITISCH WICHTIG - BU KURALLAR ASLA İHLAL EDİLEMEZ: 
+1. BEI DER ERSTEN NACHRICHT (Begrüßung):
+   - Begrüße den User freundlich und professionell.
+   - Stelle dich kurz vor (als einer der anwesenden Charaktere: {', '.join(members)}).
+   - Erwähne kurz das Meeting-Thema oder die Situation.
+   - Beispiel: "Hallo! Ich bin [Name]. Schön, dass du dabei bist. Wir besprechen heute [Thema]..."
+   - Wenn mehrere Charaktere anwesend sind, kann einer von ihnen begrüßen, oder sie begrüßen gemeinsam.
+   
+2. Analysiere die Nachricht des Benutzers.
+3. Entscheide, wer antwortet - NUR aus den anwesenden Charakteren: {', '.join(members)}
+4. Wenn der User das Ziel erreicht, gib positives Feedback ("Gute Arbeit", "Klingt nach einem Plan").
+5. KRITISCH WICHTIG - BU KURALLAR ASLA İHLAL EDİLEMEZ: 
    - Antworte NUR mit Charakteren, die in dieser Liste sind: {', '.join(members)}
    - Wenn ein Charakter NICHT in dieser Liste ist, darf er ABSOLUT NICHT antworten.
    - Wenn du einen Charakter verwenden willst, der nicht in der Liste ist, wähle stattdessen MUTLAKA einen aus der Liste.
