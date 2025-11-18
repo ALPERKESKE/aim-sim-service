@@ -82,6 +82,7 @@ async def run_simulation(request: SimulationRequest):
         
         # Seçilen karakterlerin listesi (normalize edilmiş)
         allowed_speakers = {member.strip().lower() for member in request.members}
+        print(f"✅ İzin verilen speaker'lar: {request.members}")
         
         # Response'lardaki speaker'ları filtrele
         if "responses" in parsed_response:
@@ -90,19 +91,22 @@ async def run_simulation(request: SimulationRequest):
                 speaker = resp.get("speaker", "").strip()
                 speaker_normalized = speaker.lower()
                 
+                print(f"🔍 Kontrol edilen speaker: '{speaker}' (normalize: '{speaker_normalized}')")
+                
                 # Eğer speaker seçilen listede varsa ekle
                 if speaker_normalized in allowed_speakers:
                     # Speaker adını orijinal formatta koru (ilk harf büyük)
                     resp["speaker"] = next((m for m in request.members if m.lower() == speaker_normalized), speaker)
                     filtered_responses.append(resp)
+                    print(f"✅ Geçerli speaker: {resp['speaker']}")
                 else:
-                    print(f"⚠️ Filtrelenen speaker: '{speaker}' (Seçilen: {request.members})")
+                    print(f"❌ Filtrelenen speaker: '{speaker}' (Seçilen: {request.members})")
             
             # Eğer hiç geçerli response yoksa veya yanlış karakter konuştuysa
             if len(filtered_responses) == 0:
                 # İlk seçilen karakteri kullan ve AI'ya tekrar sorma
                 first_member = request.members[0]
-                print(f"⚠️ Yanlış karakter konuştu, {first_member} kullanılıyor")
+                print(f"⚠️ Yanlış karakter konuştu veya hiç response yok, {first_member} kullanılıyor")
                 filtered_responses = [{
                     "speaker": first_member,
                     "mood": "neutral",
@@ -110,6 +114,7 @@ async def run_simulation(request: SimulationRequest):
                 }]
             
             parsed_response["responses"] = filtered_responses
+            print(f"📤 Final response speaker'ları: {[r.get('speaker') for r in filtered_responses]}")
         
         return parsed_response
 
