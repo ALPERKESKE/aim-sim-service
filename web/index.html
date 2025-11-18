@@ -57,7 +57,7 @@
                 <p style="font-size:0.9rem; color:#666; margin:0;">${info.desc}</p>
             `;
             
-            // Seçim Mantığı
+            // Seçim Mantığı ve Direkt Başlatma
             card.onclick = () => {
                 // Öncekileri temizle
                 document.querySelectorAll('.mission-card-select').forEach(c => c.classList.remove('active'));
@@ -66,6 +66,9 @@
                 selectedScenario = key;
                 startBtn.classList.add('ready');
                 startBtn.innerText = `"${info.title}" Başlat ➤`;
+                
+                // Kartın üzerine tıklayınca direkt toplantıya katıl
+                window.location.href = `simulation.html?scenario=${key}`;
             };
             grid.appendChild(card);
         }
