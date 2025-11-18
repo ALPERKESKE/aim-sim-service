@@ -313,7 +313,33 @@ async function sendMessage() {
 }
 
 function processAIResponse(data) {
-    data.responses.forEach(r => conversationHistory.push({ role: 'model', parts: [{ text: r.text }] }));
+    // Backend'den gelen response'u kontrol et
+    console.log('AI Response alındı:', data);
+    console.log('Response speaker\'ları:', data.responses?.map(r => r.speaker));
+    console.log('Seçilen üyeler:', selectedMembers);
+    
+    // Sadece seçilen üyelerin response'larını işle
+    const validResponses = data.responses.filter(r => {
+        const speaker = r.speaker?.trim();
+        const isValid = selectedMembers.some(m => m.toLowerCase() === speaker?.toLowerCase());
+        if (!isValid) {
+            console.warn(`⚠️ Geçersiz speaker filtrelendi: ${speaker}`);
+        }
+        return isValid;
+    });
+    
+    // Eğer hiç geçerli response yoksa, ilk seçilen üyeyi kullan
+    if (validResponses.length === 0 && selectedMembers.length > 0) {
+        console.warn('⚠️ Hiç geçerli response yok, ilk seçilen üye kullanılıyor');
+        validResponses.push({
+            speaker: selectedMembers[0],
+            text: "Entschuldigung, ich habe das nicht richtig verstanden. Können Sie das nochmal erklären?",
+            mood: "neutral"
+        });
+    }
+    
+    // Geçerli response'ları işle
+    validResponses.forEach(r => conversationHistory.push({ role: 'model', parts: [{ text: r.text }] }));
 
     if (data.evaluation) {
         if (data.evaluation.grammar_score > 0) {
@@ -326,7 +352,7 @@ function processAIResponse(data) {
     }
 
     let audioQueue = [];
-    for (const aiResponse of data.responses) {
+    for (const aiResponse of validResponses) {
         appendMessage(aiResponse.text, 'agent', aiResponse.speaker);
         audioQueue.push({ text: aiResponse.text, speaker: aiResponse.speaker });
     }
