@@ -437,9 +437,21 @@ async function displayMessagesSequentially(responses) {
     }
 }
 
+// Şu anda çalan sesi takip et (paralel çalmayı önlemek için)
+let isPlayingAudio = false;
+
 async function playAudioQueue(queue) {
+    // Eğer zaten bir ses çalıyorsa, bekle
+    if (isPlayingAudio) {
+        console.log('⏳ Başka bir ses çalıyor, bekleniyor...');
+        // 100ms sonra tekrar dene
+        setTimeout(() => playAudioQueue(queue), 100);
+        return;
+    }
+    
     if (queue.length === 0) {
         console.log('✅ Tüm sesler çalındı');
+        isPlayingAudio = false;
         return;
     }
     
@@ -450,6 +462,8 @@ async function playAudioQueue(queue) {
     
     console.log(`🔊 Ses çalınıyor: ${speakerName} (orijinal: ${item.speaker}) - "${item.text.substring(0, 50)}..."`);
     console.log(`📤 TTS API'ye gönderilen speaker: "${speakerName}"`);
+    
+    isPlayingAudio = true;
     
     try {
         const audioResponse = await fetch('/api/tts', {
@@ -463,35 +477,60 @@ async function playAudioQueue(queue) {
             const audioUrl = URL.createObjectURL(audioBlob);
             const audio = new Audio(audioUrl);
             
-            // Ses bittiğinde bir sonrakine geç
-            audio.onended = () => {
-                console.log(`✅ ${item.speaker} sesi bitti, sıradakine geçiliyor`);
-                URL.revokeObjectURL(audioUrl); // Memory temizliği
-                playAudioQueue(queue);
-            };
+            // Ses çalma işlemini Promise ile yönet
+            await new Promise((resolve, reject) => {
+                // Ses bittiğinde resolve et
+                audio.onended = () => {
+                    console.log(`✅ ${speakerName} sesi bitti, sıradakine geçiliyor`);
+                    URL.revokeObjectURL(audioUrl); // Memory temizliği
+                    isPlayingAudio = false;
+                    resolve();
+                };
+                
+                // Hata durumunda da resolve et (devam et)
+                audio.onerror = (e) => {
+                    console.error(`❌ Ses çalma hatası (${speakerName}):`, e);
+                    URL.revokeObjectURL(audioUrl);
+                    isPlayingAudio = false;
+                    resolve(); // Hata olsa bile devam et
+                };
+                
+                // Ses hazır olduğunda çal
+                audio.addEventListener('canplaythrough', async () => {
+                    try {
+                        await audio.play();
+                        console.log(`▶️ ${speakerName} sesi çalınıyor...`);
+                    } catch (e) {
+                        console.error(`❌ Ses oynatma hatası (${speakerName}):`, e);
+                        isPlayingAudio = false;
+                        resolve(); // Hata olsa bile devam et
+                    }
+                }, { once: true });
+                
+                // Timeout ekle (30 saniye sonra devam et)
+                setTimeout(() => {
+                    if (isPlayingAudio) {
+                        console.warn(`⏰ ${speakerName} sesi timeout, devam ediliyor...`);
+                        audio.pause();
+                        URL.revokeObjectURL(audioUrl);
+                        isPlayingAudio = false;
+                        resolve();
+                    }
+                }, 30000);
+                
+                audio.load();
+            });
             
-            // Hata durumunda da devam et
-            audio.onerror = (e) => {
-                console.error(`❌ Ses çalma hatası (${item.speaker}):`, e);
-                URL.revokeObjectURL(audioUrl);
-                playAudioQueue(queue);
-            };
-            
-            // Ses hazır olduğunda çal
-            audio.addEventListener('canplaythrough', () => {
-                audio.play().catch(e => {
-                    console.error(`❌ Ses oynatma hatası (${item.speaker}):`, e);
-                    playAudioQueue(queue);
-                });
-            }, { once: true });
-            
-            audio.load();
+            // Ses bittikten sonra bir sonrakine geç
+            playAudioQueue(queue);
         } else {
             console.error(`❌ TTS API hatası: ${audioResponse.status}`);
+            isPlayingAudio = false;
             playAudioQueue(queue);
         }
     } catch (e) {
         console.error(`❌ TTS istek hatası:`, e);
+        isPlayingAudio = false;
         playAudioQueue(queue);
     }
 }
