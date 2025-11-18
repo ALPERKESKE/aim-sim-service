@@ -65,6 +65,10 @@ window.onload = function() {
         currentUsernameSpan.textContent = `👤 ${currentUsername}`;
         usernameModal.style.display = 'none';
         mainWrapper.style.display = 'block';
+        
+        // Audio context'i başlat (kullanıcı etkileşimi için)
+        initializeAudioContext();
+        
         initializeMeeting();
     } else {
         // Eğer localStorage'da yoksa modal göster
@@ -80,6 +84,10 @@ window.onload = function() {
             currentUsernameSpan.textContent = `👤 ${username}`;
             usernameModal.style.display = 'none';
             mainWrapper.style.display = 'block';
+            
+            // Audio context'i başlat (kullanıcı etkileşimi için)
+            initializeAudioContext();
+            
             initializeMeeting();
         } else {
             alert('Lütfen adınızı girin!');
@@ -443,6 +451,32 @@ async function displayMessagesSequentially(responses) {
 
 // Şu anda çalan sesi takip et (paralel çalmayı önlemek için)
 let isPlayingAudio = false;
+let audioContextInitialized = false; // Audio context başlatıldı mı?
+
+// Audio context'i başlat (kullanıcı etkileşimi için gerekli)
+async function initializeAudioContext() {
+    if (audioContextInitialized) return;
+    
+    try {
+        // Kullanıcı etkileşimi olduğunu tarayıcıya göstermek için
+        // sessiz bir audio context başlatıyoruz
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        
+        // Kısa bir sessiz buffer oluştur ve çal
+        const buffer = audioContext.createBuffer(1, 1, 22050);
+        const source = audioContext.createBufferSource();
+        source.buffer = buffer;
+        source.connect(audioContext.destination);
+        source.start(0);
+        
+        audioContextInitialized = true;
+        console.log('✅ Audio context başlatıldı');
+    } catch (e) {
+        console.warn('⚠️ Audio context başlatılamadı:', e);
+        // Hata olsa bile devam et, belki tarayıcı desteklemiyor
+        audioContextInitialized = true;
+    }
+}
 
 async function playAudioQueue(queue) {
     // Eğer zaten bir ses çalıyorsa, bekle
@@ -502,10 +536,28 @@ async function playAudioQueue(queue) {
                 // Ses hazır olduğunda çal
                 audio.addEventListener('canplaythrough', async () => {
                     try {
-                        await audio.play();
-                        console.log(`▶️ ${speakerName} sesi çalınıyor...`);
+                        // Eğer audio context başlatılmadıysa, şimdi başlat
+                        if (!audioContextInitialized) {
+                            await initializeAudioContext();
+                        }
+                        
+                        // Ses çalmayı dene
+                        const playPromise = audio.play();
+                        
+                        if (playPromise !== undefined) {
+                            await playPromise;
+                            console.log(`▶️ ${speakerName} sesi çalınıyor...`);
+                        } else {
+                            // Eski tarayıcılar için
+                            audio.play();
+                            console.log(`▶️ ${speakerName} sesi çalınıyor...`);
+                        }
                     } catch (e) {
                         console.error(`❌ Ses oynatma hatası (${speakerName}):`, e);
+                        // Eğer kullanıcı etkileşimi hatası varsa, kullanıcıya bilgi ver
+                        if (e.name === 'NotAllowedError') {
+                            console.warn('⚠️ Ses çalma izni gerekli. Lütfen sayfayla etkileşime geçin.');
+                        }
                         isPlayingAudio = false;
                         resolve(); // Hata olsa bile devam et
                     }
