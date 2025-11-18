@@ -4,7 +4,6 @@ import uvicorn
 import httpx
 import google.generativeai as genai
 from fastapi import FastAPI, HTTPException
-from fastapi.exceptions import HTTPException as FastAPIHTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import Response
