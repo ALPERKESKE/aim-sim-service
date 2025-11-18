@@ -27,19 +27,25 @@ let currentScenario = "crisis";
 let isRecording = false; 
 let sessionScores = { grammar: [], vocab: [], mistakes: [] };
 let currentUsername = "";
+let selectedMembers = ["Thomas", "Sarah", "Mark"]; // Varsayılan olarak hepsi
 
 // --- BAŞLANGIÇ ---
 window.onload = function() {
     
-    // 1. URL'den Senaryoyu Al
+    // 1. URL'den Senaryo ve Ekip Üyelerini Al
     const urlParams = new URLSearchParams(window.location.search);
     const scenarioFromUrl = urlParams.get('scenario');
+    const membersFromUrl = urlParams.get('members');
 
     if (scenarioFromUrl && SCENARIO_INFO[scenarioFromUrl]) {
         currentScenario = scenarioFromUrl;
     } else {
         // Eğer URL boşsa varsayılanı al (Test için)
         currentScenario = Object.keys(SCENARIO_INFO)[0];
+    }
+
+    if (membersFromUrl) {
+        selectedMembers = membersFromUrl.split(',');
     }
 
     // 2. KULLANICI ADI GİRİŞİ
@@ -224,7 +230,12 @@ async function startScenarioConversation() {
         const response = await fetch('/simulate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ user_message: triggerMessage, history: [], scenario_id: currentScenario }),
+            body: JSON.stringify({ 
+                user_message: triggerMessage, 
+                history: [], 
+                scenario_id: currentScenario,
+                members: selectedMembers 
+            }),
         });
 
         if(document.getElementById(loadingId)) document.getElementById(loadingId).remove();
@@ -253,7 +264,12 @@ async function sendMessage() {
         const response = await fetch('/simulate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ user_message: message, history: conversationHistory, scenario_id: currentScenario }),
+            body: JSON.stringify({ 
+                user_message: message, 
+                history: conversationHistory, 
+                scenario_id: currentScenario,
+                members: selectedMembers 
+            }),
         });
 
         if (!response.ok) throw new Error(`API Error`);

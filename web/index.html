@@ -13,19 +13,22 @@
             <p style="color:#666;">Bugünkü toplantılarınızı seçin ve ekibi yönetin.</p>
         </div>
 
-        <h3 style="border-bottom: 2px solid #eee; padding-bottom: 10px;">👥 Ekip Arkadaşların</h3>
-        <div class="team-section">
-            <div class="team-card">
+        <h3 style="border-bottom: 2px solid #eee; padding-bottom: 10px;">👥 Ekip Arkadaşların (Toplantıya Katılacakları Seçin)</h3>
+        <div class="team-section" id="team-section">
+            <div class="team-card selectable-team-card" data-member="Thomas">
+                <input type="checkbox" class="team-checkbox" id="team-thomas" checked>
                 <div class="team-avatar thomas-av">T</div>
                 <strong>Thomas (Lead)</strong>
                 <p style="font-size:0.8rem; color:#666;">Sonuç odaklı, sakin. Çözüm istiyor. Normal tempo ile konuşur.</p>
             </div>
-            <div class="team-card">
+            <div class="team-card selectable-team-card" data-member="Sarah">
+                <input type="checkbox" class="team-checkbox" id="team-sarah" checked>
                 <div class="team-avatar sarah-av">S</div>
                 <strong>Sarah (Senior)</strong>
                 <p style="font-size:0.8rem; color:#666;">Teknik uzman. ⚡ Çok hızlı konuşur, teknik detayları hızlıca sıralar.</p>
             </div>
-            <div class="team-card">
+            <div class="team-card selectable-team-card" data-member="Mark">
+                <input type="checkbox" class="team-checkbox" id="team-mark" checked>
                 <div class="team-avatar mark-av">M</div>
                 <strong>Mark (PO)</strong>
                 <p style="font-size:0.8rem; color:#666;">Müşteri odaklı. 😊 Günlük konuşma tarzı, rahat ve samimi.</p>
@@ -41,12 +44,71 @@
         </div>
     </div>
 
+    <style>
+        .selectable-team-card {
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s;
+        }
+        .selectable-team-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .selectable-team-card.selected {
+            border: 2px solid #007bff;
+            background-color: #f0f8ff;
+        }
+        .team-checkbox {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+    </style>
     <script type="module">
         import { SCENARIO_INFO } from './scenarios.js';
 
         const grid = document.getElementById('mission-grid');
         const startBtn = document.getElementById('start-simulation-btn');
         let selectedScenario = null;
+
+        // Ekip üyesi seçim mantığı
+        document.querySelectorAll('.selectable-team-card').forEach(card => {
+            const checkbox = card.querySelector('.team-checkbox');
+            
+            card.addEventListener('click', (e) => {
+                if (e.target !== checkbox) {
+                    checkbox.checked = !checkbox.checked;
+                }
+                updateCardSelection(card, checkbox.checked);
+            });
+            
+            checkbox.addEventListener('change', (e) => {
+                updateCardSelection(card, e.target.checked);
+            });
+            
+            // Başlangıçta hepsi seçili
+            updateCardSelection(card, true);
+        });
+
+        function updateCardSelection(card, isSelected) {
+            if (isSelected) {
+                card.classList.add('selected');
+            } else {
+                card.classList.remove('selected');
+            }
+        }
+
+        function getSelectedMembers() {
+            const selected = [];
+            document.querySelectorAll('.team-checkbox:checked').forEach(checkbox => {
+                const card = checkbox.closest('.selectable-team-card');
+                selected.push(card.dataset.member);
+            });
+            return selected;
+        }
 
         // Senaryoları Ekrana Bas
         for (const [key, info] of Object.entries(SCENARIO_INFO)) {
@@ -57,7 +119,7 @@
                 <p style="font-size:0.9rem; color:#666; margin:0;">${info.desc}</p>
             `;
             
-            // Seçim Mantığı ve Direkt Başlatma
+            // Seçim Mantığı
             card.onclick = () => {
                 // Öncekileri temizle
                 document.querySelectorAll('.mission-card-select').forEach(c => c.classList.remove('active'));
@@ -66,9 +128,6 @@
                 selectedScenario = key;
                 startBtn.classList.add('ready');
                 startBtn.innerText = `"${info.title}" Başlat ➤`;
-                
-                // Kartın üzerine tıklayınca direkt toplantıya katıl
-                window.location.href = `simulation.html?scenario=${key}`;
             };
             grid.appendChild(card);
         }
@@ -76,8 +135,14 @@
         // Butona Tıklayınca
         startBtn.onclick = () => {
             if (selectedScenario) {
-                // Seçilen senaryoyu URL parametresi olarak gönder
-                window.location.href = `simulation.html?scenario=${selectedScenario}`;
+                const selectedMembers = getSelectedMembers();
+                if (selectedMembers.length === 0) {
+                    alert('Lütfen en az bir ekip arkadaşı seçin!');
+                    return;
+                }
+                // Seçilen senaryo ve ekip üyelerini URL parametresi olarak gönder
+                const membersParam = selectedMembers.join(',');
+                window.location.href = `simulation.html?scenario=${selectedScenario}&members=${membersParam}`;
             }
         };
     </script>
