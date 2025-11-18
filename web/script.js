@@ -344,7 +344,7 @@ function processAIResponse(data) {
         });
     }
     
-    // Geçerli response'ları işle
+    // Geçerli response'ları conversation history'ye ekle
     validResponses.forEach(r => conversationHistory.push({ role: 'model', parts: [{ text: r.text }] }));
 
     if (data.evaluation) {
@@ -357,12 +357,32 @@ function processAIResponse(data) {
         }
     }
 
-    let audioQueue = [];
-    for (const aiResponse of validResponses) {
+    // Mesajları sırayla göster ve ses çal
+    displayMessagesSequentially(validResponses);
+}
+
+async function displayMessagesSequentially(responses) {
+    const audioQueue = [];
+    
+    for (let i = 0; i < responses.length; i++) {
+        const aiResponse = responses[i];
+        
+        // Mesajı göster
         appendMessage(aiResponse.text, 'agent', aiResponse.speaker);
+        
+        // Ses kuyruğuna ekle
         audioQueue.push({ text: aiResponse.text, speaker: aiResponse.speaker });
+        
+        // Son mesaj değilse, bir sonraki mesajdan önce kısa bir bekleme
+        if (i < responses.length - 1) {
+            await new Promise(resolve => setTimeout(resolve, 800)); // 800ms bekleme
+        }
     }
-    playAudioQueue(audioQueue);
+    
+    // Tüm mesajlar gösterildikten sonra sesleri çal
+    if (audioQueue.length > 0) {
+        playAudioQueue(audioQueue);
+    }
 }
 
 async function playAudioQueue(queue) {
