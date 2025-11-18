@@ -63,9 +63,12 @@ SCENARIOS = {
     }
 }
 
-def get_system_prompt(scenario_id="ci_cd_fail", members=None):
+def get_system_prompt(scenario_id="ci_cd_fail", members=None, username=None):
     if members is None:
         members = ["Thomas", "Sarah", "Mark", "Lukas"]
+    
+    # Username varsa kullan, yoksa "User" kullan
+    user_name = username if username else "User"
     
     scenario = SCENARIOS.get(scenario_id, SCENARIOS["ci_cd_fail"])
     
@@ -119,15 +122,18 @@ Nur diese Charaktere können antworten. Andere Charaktere existieren in diesem M
    
    WENN MEHRERE CHARAKTERE ANWESEND SIND ({len(members)} Charaktere: {', '.join(members)}):
    - Zuerst: Die Charaktere begrüßen sich KURZ untereinander (2-3 kurze Nachrichten zwischen ihnen).
-   - Dann: Einer der Charaktere begrüßt den User und erklärt das Meeting-Thema.
+   - Dann: MUTLAKA einer der Charaktere begrüßt den User ({user_name}) direkt und erklärt das Meeting-Thema.
+   - KRITISCH: User ({user_name}) MUSS begrüßt werden! User'ı atlama!
    - Beispiel-Ablauf:
      * Charakter 1: "Hallo [anderer Charakter], schön dass du da bist."
      * Charakter 2: "Ja, danke! Lass uns anfangen."
-     * Charakter 1 (zu User): "Hallo! Ich bin [Name]. Wir besprechen heute [Thema]..."
+     * Charakter 1 (zu User): "Hallo {user_name}! Ich bin [Name]. Schön, dass du dabei bist. Wir besprechen heute [Thema]..."
+   - WICHTIG: Nach der Begrüßung untereinander, MUTLAKA User ({user_name})'ı konuşmaya çek! Eine Frage stellen oder User'ın Meinung/Input'u istiyor.
    
    WENN NUR EIN CHARAKTER ANWESEND IST:
-   - Begrüße den User direkt und erkläre das Meeting-Thema.
-   - Beispiel: "Hallo! Ich bin [Name]. Schön, dass du dabei bist. Wir besprechen heute [Thema]..."
+   - Begrüße den User ({user_name}) direkt und erkläre das Meeting-Thema.
+   - Beispiel: "Hallo {user_name}! Ich bin [Name]. Schön, dass du dabei bist. Wir besprechen heute [Thema]..."
+   - WICHTIG: User ({user_name})'ı konuşmaya çek! Eine Frage stellen oder User'ın Meinung/Input'u istiyor.
    
 2. Analysiere die Nachricht des Benutzers UND die Conversation History.
    - Schaue dir die letzten Nachrichten in der History an

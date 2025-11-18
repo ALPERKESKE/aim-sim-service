@@ -249,21 +249,24 @@ async function startScenarioConversation() {
         const firstCharacter = selectedMembers[0];
         
         // Eğer birden fazla karakter varsa, önce kendi aralarında selamlaşsınlar
+        const userName = currentUsername || "User";
         let triggerMessage;
         if (selectedMembers.length > 1) {
-            triggerMessage = `[SYSTEM: User joined the meeting. There are ${selectedMembers.length} characters present: ${membersList}. FIRST: Let the characters greet each other briefly (2-3 short messages between them). THEN: One of them should greet the user and explain the meeting topic. DO NOT use Thomas, Sarah, or any character NOT in this list: ${membersList}. German.]`;
+            triggerMessage = `[SYSTEM: User ${userName} joined the meeting. There are ${selectedMembers.length} characters present: ${membersList}. FIRST: Let the characters greet each other briefly (2-3 short messages between them). THEN: MUTLAKA one of them MUST greet the user ${userName} directly by name and explain the meeting topic. After greeting, ask ${userName} a question or invite ${userName} to share their opinion/input. DO NOT skip the user! DO NOT use Thomas, Sarah, or any character NOT in this list: ${membersList}. German.]`;
         } else {
-            triggerMessage = `[SYSTEM: User joined the meeting. Start with a friendly greeting (Begrüßung) as ${firstCharacter}. Introduce yourself briefly and mention the meeting topic. DO NOT use Thomas, Sarah, or any character NOT in this list: ${membersList}. German.]`;
+            triggerMessage = `[SYSTEM: User ${userName} joined the meeting. Start with a friendly greeting (Begrüßung) as ${firstCharacter}. Greet ${userName} directly by name and explain the meeting topic. After greeting, ask ${userName} a question or invite ${userName} to share their opinion/input. DO NOT use Thomas, Sarah, or any character NOT in this list: ${membersList}. German.]`;
         }
         
         const requestBody = { 
             user_message: triggerMessage, 
             history: [], 
             scenario_id: currentScenario,
-            members: selectedMembers 
+            members: selectedMembers,
+            username: currentUsername || null  // Username'i gönder
         };
         console.log('Backend\'e gönderilen request:', requestBody);
         console.log('Seçilen karakterler:', selectedMembers);
+        console.log('Username:', currentUsername);
         
         const response = await fetch('/simulate', {
             method: 'POST',
@@ -308,7 +311,8 @@ async function sendMessage(optionalMessage = null) {
                 user_message: message, 
                 history: conversationHistory, 
                 scenario_id: currentScenario,
-                members: selectedMembers 
+                members: selectedMembers,
+                username: currentUsername || null  // Username'i gönder
             }),
         });
 

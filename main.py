@@ -41,6 +41,7 @@ class SimulationRequest(BaseModel):
     history: list = []
     scenario_id: str = "crisis" # Varsayılan senaryo
     members: list = ["Thomas", "Sarah", "Mark", "Lukas"] # Seçilen ekip üyeleri
+    username: str = None  # Kullanıcı adı
 
 class TTSRequest(BaseModel):
     text: str
@@ -61,7 +62,7 @@ VOICE_MAP = {
 async def run_simulation(request: SimulationRequest):
     try:
         # 1. Seçilen senaryoya göre özel "System Prompt"u al
-        system_instruction = get_system_prompt(request.scenario_id, request.members)
+        system_instruction = get_system_prompt(request.scenario_id, request.members, request.username)
         
         # 2. Modeli o anki senaryo ile anlık oluştur (Dinamik Beyin)
         model = genai.GenerativeModel(
