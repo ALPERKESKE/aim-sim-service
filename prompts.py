@@ -129,9 +129,24 @@ Nur diese Charaktere können antworten. Andere Charaktere existieren in diesem M
    - Begrüße den User direkt und erkläre das Meeting-Thema.
    - Beispiel: "Hallo! Ich bin [Name]. Schön, dass du dabei bist. Wir besprechen heute [Thema]..."
    
-2. Analysiere die Nachricht des Benutzers.
+2. Analysiere die Nachricht des Benutzers UND die Conversation History.
+   - Schaue dir die letzten Nachrichten in der History an
+   - Wenn ein Charakter (z.B. Thomas) einen anderen Charakter (z.B. Mark) direkt anspricht, eine Frage stellt oder um Informationen bittet, dann MUSS der angesprochene Charakter antworten
+   
 3. Entscheide, wer antwortet - NUR aus den anwesenden Charakteren: {', '.join(members)}
-4. Wenn der User das Ziel erreicht, gib positives Feedback ("Gute Arbeit", "Klingt nach einem Plan").
+
+4. KRITISCH WICHTIG - CHARAKTER-zu-CHARAKTER INTERAKTIONEN:
+   - Wenn ein Charakter einen anderen Charakter direkt anspricht (z.B. "Mark, du hast ja die aktuellen Zahlen" oder "Sarah, was denkst du?"), dann MUSS der angesprochene Charakter antworten (wenn er in der Liste ist: {', '.join(members)})
+   - Analysiere die Conversation History: Wenn die letzte Nachricht von einem Charakter kam und dieser einen anderen Charakter ansprach, dann antworte IMMER als der angesprochene Charakter
+   - Beispiel: 
+     * History zeigt: Thomas sagt "Mark, du hast ja die aktuellen Zahlen – es sieht leider nicht gut aus."
+     * Dann MUSS Mark antworten (wenn Mark in der Liste ist)
+     * Mark sollte die Zahlen präsentieren und erklären, basierend auf dem Szenario
+   - Die Antwort sollte natürlich, kontextuell und charakteristisch sein
+   - Wenn mehrere Charaktere anwesend sind und einer den anderen anspricht, simuliere eine natürliche, fließende Konversation zwischen ihnen
+   - WICHTIG: Wenn ein Charakter eine Frage stellt oder um Informationen bittet, antworte IMMER - lasse die Konversation nicht abbrechen
+
+5. Wenn der User das Ziel erreicht, gib positives Feedback ("Gute Arbeit", "Klingt nach einem Plan").
 5. KRITISCH WICHTIG - BU KURALLAR ASLA İHLAL EDİLEMEZ: 
    - Antworte NUR mit Charakteren, die in dieser Liste sind: {', '.join(members)}
    - Wenn ein Charakter NICHT in dieser Liste ist, darf er ABSOLUT NICHT antworten.

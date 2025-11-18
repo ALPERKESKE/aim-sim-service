@@ -72,7 +72,30 @@ async def run_simulation(request: SimulationRequest):
 
         # 3. Sohbeti başlat
         chat = model.start_chat(history=request.history)
-        response = chat.send_message(request.user_message)
+        
+        # Eğer conversation history varsa ve son mesaj bir karakterden geldiyse, 
+        # AI'ya bunu açıkça belirt (karakterlerin birbirine cevap vermesi için)
+        enhanced_message = request.user_message
+        if request.history and len(request.history) > 0:
+            # Son mesajı kontrol et - eğer bir karakter başka bir karaktere hitap ediyorsa
+            last_message = request.history[-1]
+            if last_message.get('role') == 'model':
+                # Model'den gelen son mesajı kontrol et
+                last_text = ""
+                if 'parts' in last_message:
+                    for part in last_message['parts']:
+                        if 'text' in part:
+                            last_text = part['text']
+                            break
+                
+                # Eğer son mesajda bir karakter başka bir karaktere hitap ediyorsa, bunu vurgula
+                for member in request.members:
+                    if f", {member}" in last_text or f"{member}," in last_text or f"{member} " in last_text:
+                        enhanced_message = f"[CONTEXT: Ein Charakter hat {member} angesprochen. {member} sollte jetzt antworten.]\n\n{request.user_message}"
+                        print(f"💬 {member} wurde angesprochen, erwarte Antwort von {member}")
+                        break
+        
+        response = chat.send_message(enhanced_message)
         
         # 4. Temizlik (Markdown formatını kaldır)
         text_response = response.text.replace("```json", "").replace("```", "").strip()

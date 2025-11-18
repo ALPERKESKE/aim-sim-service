@@ -283,12 +283,19 @@ async function startScenarioConversation() {
     }
 }
 
-async function sendMessage() {
-    const message = userInput.value.trim();
+async function sendMessage(optionalMessage = null) {
+    const message = optionalMessage || userInput.value.trim();
     if (!message) return;
 
-    appendMessage(message, 'user');
-    userInput.value = '';
+    // Eğer optionalMessage varsa, user input'tan değil parametreden al
+    if (!optionalMessage) {
+        appendMessage(message, 'user');
+        userInput.value = '';
+    } else {
+        // Otomatik mesaj için görsel bir gösterge ekle (opsiyonel)
+        console.log(`🤖 Otomatik follow-up mesajı: ${message}`);
+    }
+    
     sendButton.disabled = true;
     
     conversationHistory.push({ role: 'user', parts: [{ text: message }] });
@@ -396,6 +403,37 @@ async function displayMessagesSequentially(responses) {
     if (audioQueue.length > 0) {
         console.log(`🎵 Ses kuyruğu hazırlandı: ${audioQueue.map(q => q.speaker).join(', ')}`);
         playAudioQueue(audioQueue);
+    }
+    
+    // Eğer son mesaj bir karaktere hitap ediyorsa, otomatik olarak o karakterin cevap vermesini sağla
+    if (responses.length > 0) {
+        const lastResponse = responses[responses.length - 1];
+        const lastText = lastResponse.text;
+        
+        // Seçilen üyelerden birine hitap edilip edilmediğini kontrol et
+        for (const member of selectedMembers) {
+            // Karakter adı mesajda geçiyor mu? (virgülle, noktayla veya boşlukla)
+            const patterns = [
+                new RegExp(`\\b${member}\\s*,`, 'i'),  // "Mark,"
+                new RegExp(`,\\s*${member}\\b`, 'i'),  // ", Mark"
+                new RegExp(`\\b${member}\\s+`, 'i'),   // "Mark "
+                new RegExp(`${member}\\?`, 'i')        // "Mark?"
+            ];
+            
+            const isAddressed = patterns.some(pattern => pattern.test(lastText));
+            
+            if (isAddressed && lastResponse.speaker?.toLowerCase() !== member.toLowerCase()) {
+                console.log(`💬 ${lastResponse.speaker} hat ${member} angesprochen. Automatische Antwort wird angefordert...`);
+                
+                // Kısa bir bekleme sonrası otomatik follow-up gönder
+                setTimeout(async () => {
+                    // User mesajı olmadan, sadece context ile follow-up gönder
+                    await sendMessage(`[CONTEXT: ${lastResponse.speaker} hat ${member} angesprochen. ${member} sollte jetzt antworten.]`);
+                }, 2000); // 2 saniye bekle (sesler çalınırken)
+                
+                break; // İlk eşleşmede dur
+            }
+        }
     }
 }
 
