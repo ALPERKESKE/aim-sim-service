@@ -51,17 +51,32 @@ window.onload = function() {
         console.log('URL\'de members parametresi yok, varsayılan kullanılıyor:', selectedMembers);
     }
 
-    // 2. KULLANICI ADI GİRİŞİ
+    // 2. KULLANICI ADI GİRİŞİ (localStorage'dan veya URL'den)
     const usernameModal = document.getElementById('username-modal');
     const usernameInput = document.getElementById('username-input');
     const joinMeetingBtn = document.getElementById('join-meeting-btn');
     const mainWrapper = document.getElementById('main-wrapper');
     const currentUsernameSpan = document.getElementById('current-username');
 
+    // Kullanıcı adını localStorage'dan al (dashboard'dan geliyorsa)
+    const savedUsername = localStorage.getItem('username');
+    if (savedUsername) {
+        currentUsername = savedUsername;
+        currentUsernameSpan.textContent = `👤 ${currentUsername}`;
+        usernameModal.style.display = 'none';
+        mainWrapper.style.display = 'block';
+        initializeMeeting();
+    } else {
+        // Eğer localStorage'da yoksa modal göster
+        usernameModal.style.display = 'flex';
+        usernameInput.focus();
+    }
+
     joinMeetingBtn.addEventListener('click', () => {
         const username = usernameInput.value.trim();
         if (username) {
             currentUsername = username;
+            localStorage.setItem('username', username); // Kaydet
             currentUsernameSpan.textContent = `👤 ${username}`;
             usernameModal.style.display = 'none';
             mainWrapper.style.display = 'block';

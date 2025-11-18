@@ -50,6 +50,27 @@
         </div>
     </div>
 
+    <!-- Kullanıcı Adı Giriş Modalı (Dashboard'da) -->
+    <div id="username-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center;">
+        <div style="background: white; padding: 30px; border-radius: 10px; max-width: 500px; width: 90%;">
+            <h2 style="margin-top: 0;">Toplantıya Katıl</h2>
+            
+            <!-- Seçim Özeti -->
+            <div id="selection-summary" style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+                <p style="margin: 0 0 10px 0; font-weight: bold; color: #333;">Seçimleriniz:</p>
+                <p id="summary-scenario" style="margin: 5px 0; color: #666;"></p>
+                <p id="summary-members" style="margin: 5px 0; color: #666;"></p>
+            </div>
+            
+            <p style="color: #666; margin-bottom: 20px;">Lütfen adınızı girin:</p>
+            <input type="text" id="username-input" placeholder="Adınız..." style="width: 100%; padding: 10px; font-size: 16px; border: 2px solid #ddd; border-radius: 5px; margin-bottom: 15px;" autocomplete="off">
+            <div style="display: flex; gap: 10px;">
+                <button id="cancel-btn" style="flex: 1; padding: 12px; background: #6c757d; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">İptal</button>
+                <button id="join-meeting-btn" style="flex: 1; padding: 12px; background: #007bff; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">Toplantıya Katıl ➤</button>
+            </div>
+        </div>
+    </div>
+
     <style>
         .selectable-team-card {
             cursor: pointer;
@@ -138,7 +159,15 @@
             grid.appendChild(card);
         }
 
-        // Butona Tıklayınca
+        // Modal elementleri
+        const usernameModal = document.getElementById('username-modal');
+        const usernameInput = document.getElementById('username-input');
+        const joinMeetingBtn = document.getElementById('join-meeting-btn');
+        const cancelBtn = document.getElementById('cancel-btn');
+        const summaryScenario = document.getElementById('summary-scenario');
+        const summaryMembers = document.getElementById('summary-members');
+
+        // Butona Tıklayınca - Modal göster
         startBtn.onclick = () => {
             if (selectedScenario) {
                 const selectedMembers = getSelectedMembers();
@@ -146,11 +175,51 @@
                     alert('Lütfen en az bir ekip arkadaşı seçin!');
                     return;
                 }
-                // Seçilen senaryo ve ekip üyelerini URL parametresi olarak gönder
-                const membersParam = selectedMembers.join(',');
-                window.location.href = `simulation.html?scenario=${selectedScenario}&members=${membersParam}`;
+                
+                // Senaryo bilgisini göster
+                const scenarioInfo = SCENARIO_INFO[selectedScenario];
+                summaryScenario.textContent = `📋 Senaryo: ${scenarioInfo.title}`;
+                summaryMembers.textContent = `👥 Katılımcılar: ${selectedMembers.join(', ')}`;
+                
+                // Modal'ı göster
+                usernameModal.style.display = 'flex';
+                usernameInput.focus();
+            } else {
+                alert('Lütfen bir toplantı senaryosu seçin!');
             }
         };
+
+        // İptal butonu
+        cancelBtn.onclick = () => {
+            usernameModal.style.display = 'none';
+            usernameInput.value = '';
+        };
+
+        // Toplantıya Katıl butonu
+        joinMeetingBtn.onclick = () => {
+            const username = usernameInput.value.trim();
+            if (!username) {
+                alert('Lütfen adınızı girin!');
+                usernameInput.focus();
+                return;
+            }
+            
+            const selectedMembers = getSelectedMembers();
+            const membersParam = selectedMembers.join(',');
+            
+            // Kullanıcı adını localStorage'a kaydet (simulation.html'de kullanmak için)
+            localStorage.setItem('username', username);
+            
+            // simulation.html'e yönlendir
+            window.location.href = `simulation.html?scenario=${selectedScenario}&members=${membersParam}`;
+        };
+
+        // Enter tuşu ile katıl
+        usernameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                joinMeetingBtn.click();
+            }
+        });
     </script>
 </body>
 </html>
