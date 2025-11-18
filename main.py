@@ -218,7 +218,11 @@ async def text_to_speech(request: TTSRequest):
                             status_code=402,  # Payment Required
                             detail=f"ElevenLabs quota exceeded: {error_msg}. Ses çalınamadı ama mesaj gösterildi."
                         )
-                except:
+                except HTTPException:
+                    # HTTPException'ı yeniden raise et
+                    raise
+                except Exception:
+                    # JSON parse hatası gibi diğer hatalar için devam et
                     pass
                 
                 raise HTTPException(status_code=500, detail="Ses servisi hatası")
