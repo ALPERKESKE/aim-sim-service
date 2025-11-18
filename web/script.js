@@ -295,6 +295,11 @@ async function startScenarioConversation() {
 }
 
 async function sendMessage(optionalMessage = null) {
+    // Eğer event objesi gönderilmişse, ignore et
+    if (optionalMessage && typeof optionalMessage === 'object' && optionalMessage.type) {
+        optionalMessage = null; // Event objesi, ignore et
+    }
+    
     const message = optionalMessage || userInput.value.trim();
     if (!message) return;
 
@@ -716,5 +721,5 @@ if (SpeechRecognition) {
     }
 }
 
-sendButton.addEventListener('click', sendMessage);
+sendButton.addEventListener('click', () => sendMessage());
 userInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
