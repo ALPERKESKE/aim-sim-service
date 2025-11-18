@@ -26,6 +26,7 @@ let conversationHistory = [];
 let currentScenario = "crisis";
 let isRecording = false; 
 let sessionScores = { grammar: [], vocab: [], mistakes: [] };
+let currentUsername = "";
 
 // --- BAŞLANGIÇ ---
 window.onload = function() {
@@ -41,23 +42,48 @@ window.onload = function() {
         currentScenario = Object.keys(SCENARIO_INFO)[0];
     }
 
-    // 2. BUTONLARI BAĞLA (EN ÖNEMLİ KISIM)
-    // Toplantıyı Bitir Butonu
+    // 2. KULLANICI ADI GİRİŞİ
+    const usernameModal = document.getElementById('username-modal');
+    const usernameInput = document.getElementById('username-input');
+    const joinMeetingBtn = document.getElementById('join-meeting-btn');
+    const mainWrapper = document.getElementById('main-wrapper');
+    const currentUsernameSpan = document.getElementById('current-username');
+
+    joinMeetingBtn.addEventListener('click', () => {
+        const username = usernameInput.value.trim();
+        if (username) {
+            currentUsername = username;
+            currentUsernameSpan.textContent = `👤 ${username}`;
+            usernameModal.style.display = 'none';
+            mainWrapper.style.display = 'block';
+            initializeMeeting();
+        } else {
+            alert('Lütfen adınızı girin!');
+        }
+    });
+
+    usernameInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            joinMeetingBtn.click();
+        }
+    });
+
+    // 3. BUTONLARI BAĞLA
     if (endMeetingBtn) {
         endMeetingBtn.addEventListener('click', finishMeeting);
     }
     
-    // Görev Listesine Dön Butonu
     if (restartBtn) {
         restartBtn.addEventListener('click', () => {
-            window.location.href = "index.html"; // Dashboard'a yönlendir
+            window.location.href = "index.html";
         });
     }
-
-    // Başlat
-    updateMissionCard();
-    startScenarioConversation(); 
 };
+
+function initializeMeeting() {
+    updateMissionCard();
+    startScenarioConversation();
+}
 
 // --- TOPLANTIYI BİTİR ---
 function finishMeeting() {
@@ -107,20 +133,50 @@ function updateMissionCard() {
     document.getElementById("mission-desc").textContent = info.desc;
     
     detailedHintsUl.innerHTML = "";
-    if (info.hints) {
+    
+    // İpuçları
+    if (info.hints && info.hints.length > 0) {
+        const hintsTitle = document.createElement("li");
+        hintsTitle.innerHTML = `<strong style="color:#495057;">💡 İpuçları:</strong>`;
+        hintsTitle.style.listStyle = "none";
+        hintsTitle.style.marginBottom = "8px";
+        detailedHintsUl.appendChild(hintsTitle);
+        
         info.hints.forEach(hint => {
             const li = document.createElement("li");
             li.textContent = hint;
             li.style.marginBottom = "5px";
+            li.style.marginLeft = "20px";
             detailedHintsUl.appendChild(li);
         });
     }
-    if (info.keywords) {
+    
+    // Kelimeler
+    if (info.keywords && info.keywords.length > 0) {
         const kwLi = document.createElement("li");
-        kwLi.innerHTML = `<strong>Kelimeler:</strong> <span style="color:#007bff">${info.keywords.join(", ")}</span>`;
-        kwLi.style.marginTop = "10px";
+        kwLi.innerHTML = `<strong style="color:#495057;">📚 Önemli Kelimeler:</strong> <span style="color:#007bff">${info.keywords.join(", ")}</span>`;
+        kwLi.style.marginTop = "15px";
         kwLi.style.listStyle = "none";
         detailedHintsUl.appendChild(kwLi);
+    }
+    
+    // Örnek Cümleler
+    if (info.exampleSentences && info.exampleSentences.length > 0) {
+        const examplesTitle = document.createElement("li");
+        examplesTitle.innerHTML = `<strong style="color:#495057;">💬 Örnek Cümleler:</strong>`;
+        examplesTitle.style.listStyle = "none";
+        examplesTitle.style.marginTop = "15px";
+        examplesTitle.style.marginBottom = "8px";
+        detailedHintsUl.appendChild(examplesTitle);
+        
+        info.exampleSentences.forEach(sentence => {
+            const li = document.createElement("li");
+            li.innerHTML = `<em style="color:#28a745;">"${sentence}"</em>`;
+            li.style.marginBottom = "8px";
+            li.style.marginLeft = "20px";
+            li.style.fontSize = "0.85rem";
+            detailedHintsUl.appendChild(li);
+        });
     }
 }
 

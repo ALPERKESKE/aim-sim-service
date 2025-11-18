@@ -7,12 +7,25 @@
     <link rel="stylesheet" href="style.css"> 
 </head>
 <body>
-    <div id="main-wrapper">
+    <!-- Kullanıcı Adı Giriş Modalı -->
+    <div id="username-modal" style="display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center;">
+        <div style="background: white; padding: 30px; border-radius: 10px; max-width: 400px; width: 90%;">
+            <h2 style="margin-top: 0;">Toplantıya Katıl</h2>
+            <p style="color: #666; margin-bottom: 20px;">Lütfen adınızı girin:</p>
+            <input type="text" id="username-input" placeholder="Adınız..." style="width: 100%; padding: 10px; font-size: 16px; border: 2px solid #ddd; border-radius: 5px; margin-bottom: 15px;" autocomplete="off">
+            <button id="join-meeting-btn" style="width: 100%; padding: 12px; background: #007bff; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">Toplantıya Katıl ➤</button>
+        </div>
+    </div>
+
+    <div id="main-wrapper" style="display: none;">
         
         <div id="mission-card">
             <div class="mission-header">
                 <h3 id="mission-title">Yükleniyor...</h3>
-                <button id="end-meeting-btn">Toplantıyı Bitir 🏁</button>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span id="current-username" style="color: #666; font-size: 0.9rem;"></span>
+                    <button id="end-meeting-btn">Toplantıyı Bitir 🏁</button>
+                </div>
             </div>
             
             <p id="mission-desc">...</p>
