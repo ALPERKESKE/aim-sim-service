@@ -99,13 +99,29 @@ async def text_to_speech(request: TTSRequest):
         # OPTİMİZASYON 2: Sesin başı kesilmesin diye padding ekle (" ... ")
         safe_text = " ... " + request.text
 
+        # Karaktere göre ses ayarları
+        voice_settings = {
+            "stability": 0.5,
+            "similarity_boost": 0.7
+        }
+        
+        # Sarah için: Daha hızlı ve net konuşma (stability düşük = daha hızlı)
+        if request.speaker == "Sarah":
+            voice_settings = {
+                "stability": 0.3,  # Daha düşük = daha hızlı ve dinamik
+                "similarity_boost": 0.8  # Yüksek = daha net
+            }
+        # Mark için: Daha casual ve rahat konuşma
+        elif request.speaker == "Mark":
+            voice_settings = {
+                "stability": 0.6,  # Biraz daha yüksek = daha rahat
+                "similarity_boost": 0.65  # Biraz daha düşük = daha casual
+            }
+        
         payload = {
             "text": safe_text,
             "model_id": "eleven_turbo_v2_5", # En hızlı ve Almanca destekli model
-            "voice_settings": {
-                "stability": 0.5,
-                "similarity_boost": 0.7
-            }
+            "voice_settings": voice_settings
         }
 
         # OPTİMİZASYON 3: Mac SSL Hatası için verify=False
