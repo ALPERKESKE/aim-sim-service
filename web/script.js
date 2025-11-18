@@ -160,23 +160,54 @@ function updateMissionCard() {
         detailedHintsUl.appendChild(kwLi);
     }
     
-    // Örnek Cümleler
+    // Örnek Cümleler (Gizli başlar, buton ile gösterilir)
     if (info.exampleSentences && info.exampleSentences.length > 0) {
-        const examplesTitle = document.createElement("li");
+        const examplesContainer = document.createElement("li");
+        examplesContainer.style.listStyle = "none";
+        examplesContainer.style.marginTop = "15px";
+        
+        const examplesTitle = document.createElement("div");
+        examplesTitle.style.display = "flex";
+        examplesTitle.style.alignItems = "center";
+        examplesTitle.style.gap = "10px";
         examplesTitle.innerHTML = `<strong style="color:#495057;">💬 Örnek Cümleler:</strong>`;
-        examplesTitle.style.listStyle = "none";
-        examplesTitle.style.marginTop = "15px";
-        examplesTitle.style.marginBottom = "8px";
-        detailedHintsUl.appendChild(examplesTitle);
+        
+        const toggleBtn = document.createElement("button");
+        toggleBtn.textContent = "Göster";
+        toggleBtn.id = "toggle-examples-btn";
+        toggleBtn.style.cssText = "padding: 5px 12px; background: #28a745; color: white; border: none; border-radius: 5px; font-size: 0.85rem; cursor: pointer;";
+        
+        const examplesList = document.createElement("ul");
+        examplesList.id = "examples-list";
+        examplesList.style.display = "none";
+        examplesList.style.marginTop = "8px";
+        examplesList.style.paddingLeft = "20px";
+        examplesList.style.listStyle = "none";
         
         info.exampleSentences.forEach(sentence => {
             const li = document.createElement("li");
             li.innerHTML = `<em style="color:#28a745;">"${sentence}"</em>`;
             li.style.marginBottom = "8px";
-            li.style.marginLeft = "20px";
             li.style.fontSize = "0.85rem";
-            detailedHintsUl.appendChild(li);
+            examplesList.appendChild(li);
         });
+        
+        toggleBtn.addEventListener('click', () => {
+            if (examplesList.style.display === 'none') {
+                examplesList.style.display = 'block';
+                toggleBtn.textContent = 'Gizle';
+                toggleBtn.style.background = '#dc3545';
+            } else {
+                examplesList.style.display = 'none';
+                toggleBtn.textContent = 'Göster';
+                toggleBtn.style.background = '#28a745';
+            }
+        });
+        
+        examplesTitle.appendChild(toggleBtn);
+        examplesContainer.appendChild(examplesTitle);
+        examplesContainer.appendChild(examplesList);
+        detailedHintsUl.appendChild(examplesContainer);
     }
 }
 
