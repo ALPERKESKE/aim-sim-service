@@ -40,7 +40,7 @@ class SimulationRequest(BaseModel):
     user_message: str
     history: list = []
     scenario_id: str = "crisis" # Varsayılan senaryo
-    members: list = ["Thomas", "Sarah", "Mark"] # Seçilen ekip üyeleri
+    members: list = ["Thomas", "Sarah", "Mark", "Lukas"] # Seçilen ekip üyeleri
 
 class TTSRequest(BaseModel):
     text: str
@@ -51,6 +51,7 @@ VOICE_MAP = {
     "Thomas": "ErXwobaYiN019PkySvjV", # Antoni (Otoriter Erkek)
     "Sarah": "EXAVITQu4vr4xnSDxMaL",  # Bella (Net Kadın)
     "Mark": "TxGEqnHWrfWFTfGW9XjX",   # Josh (Yumuşak Erkek)
+    "Lukas": "pNInz6obpgDQGcFmaJgB",  # Adam (Bavyera lehçesi için uygun erkek sesi)
     "System": "21m00Tcm4TlvDq8ikWAM"  # Rachel
 }
 
@@ -117,6 +118,12 @@ async def text_to_speech(request: TTSRequest):
             voice_settings = {
                 "stability": 0.6,  # Biraz daha yüksek = daha rahat
                 "similarity_boost": 0.65  # Biraz daha düşük = daha casual
+            }
+        # Lukas için: Bavyera lehçesi için özel ayar
+        elif request.speaker == "Lukas":
+            voice_settings = {
+                "stability": 0.55,  # Orta seviye
+                "similarity_boost": 0.75  # Yüksek = daha karakteristik
             }
         
         payload = {

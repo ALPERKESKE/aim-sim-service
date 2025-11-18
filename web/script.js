@@ -27,7 +27,7 @@ let currentScenario = "crisis";
 let isRecording = false; 
 let sessionScores = { grammar: [], vocab: [], mistakes: [] };
 let currentUsername = "";
-let selectedMembers = ["Thomas", "Sarah", "Mark"]; // Varsayılan olarak hepsi
+let selectedMembers = ["Thomas", "Sarah", "Mark", "Lukas"]; // Varsayılan olarak hepsi
 
 // --- BAŞLANGIÇ ---
 window.onload = function() {

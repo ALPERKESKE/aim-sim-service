@@ -65,7 +65,7 @@ SCENARIOS = {
 
 def get_system_prompt(scenario_id="ci_cd_fail", members=None):
     if members is None:
-        members = ["Thomas", "Sarah", "Mark"]
+        members = ["Thomas", "Sarah", "Mark", "Lukas"]
     
     scenario = SCENARIOS.get(scenario_id, SCENARIOS["ci_cd_fail"])
     
@@ -90,6 +90,13 @@ def get_system_prompt(scenario_id="ci_cd_fail", members=None):
    - Persönlichkeit: Achtet auf Business-Value und Zeitpläne. Ist freundlich, aber will Ergebnisse.
    - Sprechstil: GÜNLÜK KONUŞMA (casual, informal)! Redet locker, freundlich, wie mit Kollegen. Nutzt umgangssprachliche Ausdrücke, "du" statt "Sie", manchmal kurze Sätze oder Fragen. Professionell ama rahat.
    - Beispiel: "Hey, alles klar? Also, wir müssen das bis Freitag schaffen, okay? Sonst wird's eng mit dem Release. Was denkst du, schaffen wir das?"""")
+    
+    if "Lukas" in members:
+        characters_desc.append("""4. LUKAS (Senior Engineer, aus Bayern):
+   - Persönlichkeit: Sehr erfahrener Engineer, kommt aus Bayern/München. Direkt, pragmatisch, manchmal etwas grob aber herzlich. Technisch sehr kompetent.
+   - Sprechstil: BAYERISCHER DIALEKT! Redet im bayerischen Dialekt mit typischen Ausdrücken wie "gell", "fei", "ned", "oiso", "des is", "hob i", "kumm", "geh", etc. Professionell aber mit bayerischem Charme. Manchmal etwas direkter als die anderen.
+   - Beispiel: "Oiso, des Problem hob i scho gsegn. Des is a klassischer Fall vo an Race Condition, gell? Mir miassn des fei richtig locken, sonst wird's nix. Kumm, lass ma des ois richtig machn!"
+   - WICHTIG: Verwende authentischen bayerischen Dialekt, aber bleibe professionell und technisch korrekt.""")
     
     characters_text = "\n\n".join(characters_desc)
     
