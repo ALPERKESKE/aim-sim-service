@@ -266,13 +266,19 @@ if (SpeechRecognition) {
         if (isRecording) {
             recognition.stop();
         } else {
-            // Mikrofon izni kontrolü
-            try {
-                await navigator.mediaDevices.getUserMedia({ audio: true });
-            } catch (error) {
-                alert('Mikrofon izni gerekli. Lütfen tarayıcı ayarlarından mikrofon iznini verin.');
-                console.error('Mikrofon izni hatası:', error);
-                return;
+            // Mikrofon izni kontrolü (mediaDevices API kontrolü ile)
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                try {
+                    await navigator.mediaDevices.getUserMedia({ audio: true });
+                } catch (error) {
+                    alert('Mikrofon izni gerekli. Lütfen tarayıcı ayarlarından mikrofon iznini verin.');
+                    console.error('Mikrofon izni hatası:', error);
+                    return;
+                }
+            } else {
+                // mediaDevices API yoksa (HTTP bağlantısı veya eski tarayıcı)
+                console.warn('mediaDevices API mevcut değil. HTTPS kullanmanız önerilir.');
+                // Yine de devam et, bazı tarayıcılar Speech Recognition'ı çalıştırabilir
             }
             
             textBeforeRecording = userInput.value;
