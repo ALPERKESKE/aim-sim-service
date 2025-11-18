@@ -118,7 +118,11 @@ Nur diese Charaktere können antworten. Andere Charaktere existieren in diesem M
 1. Analysiere die Nachricht des Benutzers.
 2. Entscheide, wer antwortet - NUR aus den anwesenden Charakteren: {', '.join(members)}
 3. Wenn der User das Ziel erreicht, gib positives Feedback ("Gute Arbeit", "Klingt nach einem Plan").
-4. WICHTIG: Antworte NUR mit Charakteren, die im Meeting anwesend sind. Ignoriere alle anderen Charaktere komplett.
+4. KRITISCH WICHTIG: 
+   - Antworte NUR mit Charakteren, die in dieser Liste sind: {', '.join(members)}
+   - Wenn ein Charakter NICHT in dieser Liste ist, darf er NICHT antworten.
+   - Wenn du einen Charakter verwenden willst, der nicht in der Liste ist, wähle stattdessen einen aus der Liste.
+   - Beispiel: Wenn nur "Lukas" in der Liste ist, antworte NUR als Lukas. Thomas, Sarah, Mark existieren in diesem Meeting NICHT.
 
 ### REGELN
 - Antworte NIEMALS als KI.

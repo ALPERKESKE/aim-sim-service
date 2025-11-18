@@ -77,7 +77,40 @@ async def run_simulation(request: SimulationRequest):
         # 4. Temizlik (Markdown formatını kaldır)
         text_response = response.text.replace("```json", "").replace("```", "").strip()
         
-        return json.loads(text_response)
+        # 5. Response'u parse et ve sadece seçilen karakterlerin konuşmasını filtrele
+        parsed_response = json.loads(text_response)
+        
+        # Seçilen karakterlerin listesi
+        allowed_speakers = set(request.members)
+        
+        # Response'lardaki speaker'ları filtrele
+        if "responses" in parsed_response:
+            filtered_responses = []
+            for resp in parsed_response["responses"]:
+                speaker = resp.get("speaker", "")
+                # Speaker adını normalize et (büyük/küçük harf farkını göz ardı et)
+                speaker_normalized = speaker.strip()
+                
+                # Eğer speaker seçilen listede varsa ekle
+                if any(member.lower() == speaker_normalized.lower() for member in allowed_speakers):
+                    filtered_responses.append(resp)
+                else:
+                    print(f"⚠️ Filtrelenen speaker: {speaker} (Seçilen: {request.members})")
+            
+            parsed_response["responses"] = filtered_responses
+            
+            # Eğer hiç response kalmadıysa, ilk seçilen karakteri kullan
+            if len(filtered_responses) == 0 and len(allowed_speakers) > 0:
+                first_member = list(allowed_speakers)[0]
+                print(f"⚠️ Hiç geçerli response yok, varsayılan olarak {first_member} kullanılıyor")
+                # Bu durumda AI'ya tekrar sormak yerine, kullanıcıya bilgi ver
+                parsed_response["responses"] = [{
+                    "speaker": first_member,
+                    "mood": "neutral",
+                    "text": "Entschuldigung, ich habe das nicht richtig verstanden. Können Sie das nochmal erklären?"
+                }]
+        
+        return parsed_response
 
     except Exception as e:
         print(f"Gemini Hata: {str(e)}")
