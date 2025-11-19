@@ -60,6 +60,21 @@ SCENARIOS = {
         "description": "Ekibe yeni katılan Junior, Git akışını anlamadı.",
         "user_goal": "Ona 'Git Flow' ve 'Feature Branch' yapısını nazikçe açıkla.",
         "system_context": "Durum: Eğitim ve bilgi paylaşımı."
+    },
+    # --- YENİ MÜLAKAT SENARYOLARI ---
+    "interview_basic": {
+        "title": "Mülakat (Basic)",
+        "description": "Junior/Mid-Level DevOps pozisyonu için teknik mülakat.",
+        "user_goal": "Sorulan temel sorulara (Linux, Git, Docker) doğru cevaplar ver.",
+        "system_context": "Durum: İşe alım mülakatı. Thomas ve Sarah mülakat yapıyor.",
+        "difficulty": "basic"
+    },
+    "interview_hardcore": {
+        "title": "Mülakat (Hardcore)",
+        "description": "Senior/Lead DevOps pozisyonu için zorlu teknik mülakat.",
+        "user_goal": "Derin teknik sorulara (Kernel, K8s Internals, Arch) detaylı cevaplar ver.",
+        "system_context": "Durum: Zorlu bir teknik mülakat. Detaylar sorgulanıyor.",
+        "difficulty": "hardcore"
     }
 }
 
@@ -68,7 +83,7 @@ def get_system_prompt(scenario_id="ci_cd_fail", members=None, username=None):
         members = ["Thomas", "Sarah", "Mark", "Lukas"]
     
     # Username varsa kullan, yoksa "User" kullan
-    user_name = username if username else "User"
+    user_name = username if username else "Bewerber"
     
     scenario = SCENARIOS.get(scenario_id, SCENARIOS["ci_cd_fail"])
     
@@ -78,31 +93,110 @@ def get_system_prompt(scenario_id="ci_cd_fail", members=None, username=None):
     if "Thomas" in members:
         characters_desc.append("""1. THOMAS (Team Lead): 
    - Persönlichkeit: Erfahren, ruhig, lösungsorientiert. Fragt nach dem "Warum" und "Wie".
-   - Stimmung: Startet neutral/interessiert. Wird NICHT wütend, sondern fragt kritisch nach.
+   - Rolle im Interview: Führt das Gespräch, stellt grundlegende und architektonische Fragen.
    - Sprechstil: Normal tempo, klar strukturiert, professionell.""")
     
     if "Sarah" in members:
         characters_desc.append("""2. SARAH (Senior DevOps Engineer):
-   - Persönlichkeit: Expertin, hilfreich, sehr technisch. Nutzt viele Fachbegriffe (Container, Latency, Throughput, Kubernetes, CI/CD).
-   - Rolle: Unterstützt den User, wenn er technische Details nennt.
-   - Sprechstil: SEHR SCHNELL sprechend! Redet schnell, direkt, ohne Pausen. Technische Details werden schnell aufgelistet. Kurze, prägnante Sätze. Tempo ist deutlich höher als die anderen.
-   - Beispiel: "Okay, ich hab's! Der Fehler liegt in den Unit Tests, genauer gesagt in der TestUtils-Klasse, Zeile 42. Wir müssen die Mock-Konfiguration anpassen, dann läuft der Build durch."""")
+   - Persönlichkeit: Expertin, hilfreich, sehr technisch. Nutzt viele Fachbegriffe.
+   - Rolle im Interview: Stellt die 'harten' technischen Fragen (Deep Dive). Prüft das Detailwissen.
+   - Sprechstil: SEHR SCHNELL sprechend! Redet schnell, direkt, ohne Pausen.""")
     
     if "Mark" in members:
         characters_desc.append("""3. MARK (Product Owner):
-   - Persönlichkeit: Achtet auf Business-Value und Zeitpläne. Ist freundlich, aber will Ergebnisse.
-   - Sprechstil: GÜNLÜK KONUŞMA (casual, informal)! Redet locker, freundlich, wie mit Kollegen. Nutzt umgangssprachliche Ausdrücke, "du" statt "Sie", manchmal kurze Sätze oder Fragen. Professionell ama rahat.
-   - Beispiel: "Hey, alles klar? Also, wir müssen das bis Freitag schaffen, okay? Sonst wird's eng mit dem Release. Was denkst du, schaffen wir das?"""")
+   - Persönlichkeit: Achtet auf Business-Value und Zeitpläne.
+   - Rolle im Interview: Fragt nach Priorisierung, Stakeholder-Management und agilen Methoden.
+   - Sprechstil: GÜNLÜK KONUŞMA (casual, informal)!""")
     
     if "Lukas" in members:
         characters_desc.append("""4. LUKAS (Senior Engineer, aus Bayern):
-   - Persönlichkeit: Sehr erfahrener Engineer, kommt aus Bayern/München. Direkt, pragmatisch, manchmal etwas grob aber herzlich. Technisch sehr kompetent.
-   - Sprechstil: BAYERISCHER DIALEKT! Redet im bayerischen Dialekt mit typischen Ausdrücken wie "gell", "fei", "ned", "oiso", "des is", "hob i", "kumm", "geh", etc. Professionell aber mit bayerischem Charme. Manchmal etwas direkter als die anderen.
-   - Beispiel: "Oiso, des Problem hob i scho gsegn. Des is a klassischer Fall vo an Race Condition, gell? Mir miassn des fei richtig locken, sonst wird's nix. Kumm, lass ma des ois richtig machn!"
-   - WICHTIG: Verwende authentischen bayerischen Dialekt, aber bleibe professionell und technisch korrekt.""")
+   - Persönlichkeit: Sehr erfahrener Engineer, kommt aus Bayern/München.
+   - Rolle im Interview: Fragt nach praktischer Erfahrung und "War Stories". Prüft Stressresistenz.
+   - Sprechstil: BAYERISCHER DIALEKT!""")
     
     characters_text = "\n\n".join(characters_desc)
     
+    # --- MÜLAKAT MODU KONTROLÜ ---
+    if "interview" in scenario_id:
+        difficulty = scenario.get("difficulty", "basic")
+        
+        interview_style = ""
+        if difficulty == "basic":
+            interview_style = """
+            - SCHWIERIGKEIT: BASIS / MID-LEVEL.
+            - Themen: Linux Basics, Git (Commit, Push, Pull, Branch), Docker Grundlagen (Image, Container, Dockerfile), CI/CD Konzepte.
+            - Sei freundlich und unterstützend.
+            - Wenn der User nicht weiterweiß, gib kleine Hinweise.
+            """
+        else: # hardcore
+            interview_style = """
+            - SCHWIERIGKEIT: EXPERTE / HARDCORE.
+            - Themen: Linux Kernel (Namespaces, Cgroups), Kubernetes Internals (Scheduler, Etcd, Controller Manager), Network Protocols (TCP/IP, DNS Deep Dive), Security Hardening, System Design.
+            - Sei kritisch und detailverliebt.
+            - Frage immer nach dem "Warum". Hinterfrage jede Antwort.
+            - Akzeptiere keine oberflächlichen Antworten. Bohr nach!
+            """
+
+        return f"""
+Du bist ein 'DevOps Interview-Simulator'.
+Du simulierst ein technisches Vorstellungsgespräch (Bewerbungsgespräch).
+
+### SZENARIO: {scenario['title']}
+CONTEXT: {scenario['system_context']}
+ZIEL DES USERS (Bewerber): {scenario['user_goal']}
+BEWERBER NAME: {user_name}
+
+### INTERVIEW STIL & REGELN
+{interview_style}
+
+### DIE INTERVIEWER (Deine Charaktere)
+Nur diese Charaktere sind anwesend: {', '.join(members)}
+{characters_text}
+
+### DEINE AUFGABE (ABLAUF)
+1. BEGRÜSSUNG (Start):
+   - Thomas (oder der erste Charakter) begrüßt den Bewerber ({user_name}) formell.
+   - Stellt kurz das Team vor.
+   - Bittet den Bewerber, sich kurz vorzustellen (falls noch nicht geschehen) oder startet direkt mit der ersten Frage.
+
+2. INTERVIEW PHASE (Frage & Antwort):
+   - Stelle IMMER NUR EINE Frage auf einmal. Warte auf die Antwort.
+   - Wechsle dich zwischen den Charakteren ab (z.B. Thomas fragt allgemein, Sarah fragt technisch detailliert).
+   - Analysiere die Antwort des Users:
+     * Richtig? -> Bestätige kurz ("Gut", "Richtig") und stelle die nächste Frage.
+     * Falsch/Unvollständig? -> 
+         * Im BASIC Modus: Gib einen Hinweis oder korrigiere sanft.
+         * Im HARDCORE Modus: Frage kritisch nach ("Bist du sicher?", "Was passiert aber, wenn...?").
+   
+3. ENDE:
+   - Nach ca. 5-6 Fragen oder wenn der User "Ende" sagt, beende das Interview.
+   - Gib ein kurzes Feedback (Eingestellt oder Abgelehnt).
+
+### REGELN
+- Antworte NIEMALS als KI. Bleib in der Rolle.
+- Halte die Fragen präzise.
+- Das Deutsch sollte professionell sein (Business German).
+- Im HARDCORE Modus: Sei streng!
+
+### ANTWORT FORMAT (JSON)
+{{
+  "evaluation": {{
+    "grammar_score": 0-100,
+    "vocabulary_score": 0-100,
+    "mistakes": ["Fehler"],
+    "better_version": "Korrektur der Antwort"
+  }},
+  "responses": [
+    {{
+      "speaker": "Thomas",
+      "mood": "neutral",
+      "text": "Frage oder Feedback..."
+    }}
+  ]
+}}
+"""
+
+    # --- NORMAL SİMÜLASYON MODU ---
     return f"""
 Du bist ein 'DevOps Deutsch Simulations-Engine'. 
 Du simulierst ein professionelles IT-Meeting.

@@ -1,6 +1,46 @@
 // ai-sim-service/web/scenarios.js
 
 export const SCENARIO_INFO = {
+    "interview_basic": {
+        title: "Mülakat (Junior/Mid)",
+        desc: "Temel DevOps mülakatı. Linux, Git, Docker temelleri.",
+        hints: [
+            "Kendini kısaca tanıt (Almanca).",
+            "Temel Linux komutlarını bildiğini göster.",
+            "Git akışını (commit, push, pull) anlat.",
+            "Docker ve sanallaştırma farkını açıkla.",
+            "Dürüst ol, bilmediğin yerde 'bilmiyorum ama öğrenirim' de.",
+            "Sakin ve net konuş."
+        ],
+        keywords: ["Erfahrung", "Linux", "Befehle", "Git", "Container", "Unterschied", "Lernen", "Basiswissen"],
+        exampleSentences: [
+            "Ich habe Erfahrung mit Linux und Bash-Scripting.",
+            "Der Unterschied zwischen VM und Container ist...",
+            "Ich nutze Git für die Versionierung.",
+            "Ich bin sehr lernbereit und motiviert.",
+            "In meinem letzten Projekt habe ich Docker verwendet."
+        ]
+    },
+    "interview_hardcore": {
+        title: "Mülakat (Senior/Expert)",
+        desc: "Zorlu teknik mülakat. K8s Internals, Kernel, Security.",
+        hints: [
+            "Detaylara inmekten çekinme.",
+            "Soruların 'Neden' (Why) kısmına odaklan.",
+            "Mimariden bahset (High Availability, Scalability).",
+            "K8s bileşenlerini (etcd, scheduler) detaylandır.",
+            "Security best practices'leri vurgula.",
+            "Zor sorulara analitik yaklaş."
+        ],
+        keywords: ["Architektur", "Skalierbarkeit", "Kernel", "Namespace", "Sicherheit", "Performance", "Engpass", "Cluster"],
+        exampleSentences: [
+            "Die Latenz könnte durch den Scheduler verursacht werden.",
+            "Wir nutzen Namespaces für die Isolation.",
+            "Für High Availability brauchen wir mindestens 3 Replicas.",
+            "Die Security-Policy muss verschärft werden.",
+            "Das Problem liegt wahrscheinlich im Kernel-Space."
+        ]
+    },
     "ci_cd_fail": {
         title: "CI/CD Pipeline Hatası",
         desc: "Test aşamasında pipeline kırıldı. Ekip çözüm bekliyor.",

@@ -211,18 +211,25 @@ async def text_to_speech(request: TTSRequest):
                 # Quota hatası kontrolü
                 try:
                     error_json = response.json()
-                    if error_json.get("detail", {}).get("status") == "quota_exceeded":
+                    print(f"🔍 Error JSON: {error_json}")
+                    status = error_json.get("detail", {}).get("status")
+                    print(f"🔍 Status: {status}")
+                    if status == "quota_exceeded":
                         error_msg = error_json.get("detail", {}).get("message", "Quota exceeded")
                         print(f"⚠️ ElevenLabs Quota Hatası: {error_msg}")
                         raise HTTPException(
                             status_code=402,  # Payment Required
                             detail=f"ElevenLabs quota exceeded: {error_msg}. Ses çalınamadı ama mesaj gösterildi."
                         )
+                    else:
+                        print(f"⚠️ Status '{status}' quota_exceeded değil, 500 döndürülecek")
                 except HTTPException:
                     # HTTPException'ı yeniden raise et
+                    print(f"✅ HTTPException yakalandı ve yeniden raise ediliyor")
                     raise
-                except Exception:
+                except Exception as parse_error:
                     # JSON parse hatası gibi diğer hatalar için devam et
+                    print(f"⚠️ JSON parse hatası veya başka hata: {parse_error}")
                     pass
                 
                 raise HTTPException(status_code=500, detail="Ses servisi hatası")

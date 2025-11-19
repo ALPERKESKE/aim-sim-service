@@ -259,9 +259,20 @@ async function startScenarioConversation() {
         // Eğer birden fazla karakter varsa, önce kendi aralarında selamlaşsınlar
         const userName = currentUsername || "User";
         let triggerMessage;
-        if (selectedMembers.length > 1) {
+        
+        if (currentScenario.includes("interview")) {
+            // MÜLAKAT MODU TETİKLEYİCİSİ
+            triggerMessage = `[SYSTEM: INTERVIEW START. The user is the applicant (${userName}). The characters present (${membersList}) are the interviewers.
+            TASK: Start the interview immediately.
+            1. One of the characters (e.g. Thomas) MUST greet the applicant (${userName}) formally and introduce the team briefly.
+            2. Then, immediately ask the FIRST interview question based on the scenario difficulty.
+            3. DO NOT discuss among characters. Speak directly to the applicant.
+            4. German language.]`;
+        } else if (selectedMembers.length > 1) {
+            // NORMAL TOPLANTI MODU (Çoklu Karakter)
             triggerMessage = `[SYSTEM: User ${userName} joined the meeting. There are ${selectedMembers.length} characters present: ${membersList}. FIRST: Let the characters greet each other briefly (2-3 short messages between them). THEN: MUTLAKA one of them MUST greet the user ${userName} directly by name and explain the meeting topic. After greeting, ask ${userName} a question or invite ${userName} to share their opinion/input. DO NOT skip the user! DO NOT use Thomas, Sarah, or any character NOT in this list: ${membersList}. German.]`;
         } else {
+            // NORMAL TOPLANTI MODU (Tek Karakter)
             triggerMessage = `[SYSTEM: User ${userName} joined the meeting. Start with a friendly greeting (Begrüßung) as ${firstCharacter}. Greet ${userName} directly by name and explain the meeting topic. After greeting, ask ${userName} a question or invite ${userName} to share their opinion/input. DO NOT use Thomas, Sarah, or any character NOT in this list: ${membersList}. German.]`;
         }
         
