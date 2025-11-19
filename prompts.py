@@ -87,6 +87,13 @@ def get_system_prompt(scenario_id="ci_cd_fail", members=None, username=None):
     
     scenario = SCENARIOS.get(scenario_id, SCENARIOS["ci_cd_fail"])
     
+    # FIX: Eğer scenario_id içinde "interview" geçiyorsa ama SCENARIOS'ta bulunamadıysa (default'a düştüyse)
+    # Bu durumda "ci_cd_fail" yerine "interview_basic"e fallback yapmalıyız.
+    # Aksi takdirde Interview Prompt şablonu ile CI/CD içeriği karışıyor.
+    if "interview" in scenario_id and scenario_id not in SCENARIOS:
+        scenario = SCENARIOS["interview_basic"]
+
+    
     # Sadece seçilen karakterlerin açıklamalarını ekle
     characters_desc = []
     
