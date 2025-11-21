@@ -13,7 +13,8 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-
 .sarah-av { background: #e8f5e9; color: #2e7d32; }
 .mark-av { background: #fff8e1; color: #f57f17; }
 
-.mission-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+/* Mobil için min-width 300px -> 250px yapıldı */
+.mission-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
 .mission-card-select { background: white; border-left: 5px solid #ccc; border-radius: 8px; padding: 20px; cursor: pointer; transition: all 0.2s; position: relative; }
 .mission-card-select:hover { transform: scale(1.02); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
 .mission-card-select.active { border-left-color: #007bff; background: #f8fbff; border: 1px solid #007bff; }
@@ -39,11 +40,12 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-
 .message.user .message-content { background-color: #007bff; color: white; border-bottom-right-radius: 2px; }
 .message.agent .message-content { background-color: #ffffff; color: #333; border-bottom-left-radius: 2px; border: 1px solid #e9ecef; }
 #input-area { padding: 20px; background-color: #fff; border-top: 1px solid #eee; display: flex; gap: 10px; align-items: center; }
-.icon-btn { background: #f8f9fa; border: 1px solid #ced4da; border-radius: 50%; width: 45px; height: 45px; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.icon-btn { background: #f8f9fa; border: 1px solid #ced4da; border-radius: 50%; width: 45px; height: 45px; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .recording { background-color: #dc3545 !important; color: white; animation: pulse 1.5s infinite; }
 @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(220, 53, 69, 0); } }
-#user-input { flex-grow: 1; padding: 12px; border: 2px solid #eee; border-radius: 25px; font-size: 1rem; outline: none; }
-#send-button { background-color: #007bff; color: white; border: none; padding: 0 25px; border-radius: 25px; cursor: pointer; font-weight: bold; }
+#user-input { flex-grow: 1; padding: 12px; border: 2px solid #eee; border-radius: 25px; font-size: 1rem; outline: none; min-width: 0; } /* min-width: 0 taşmayı önler */
+#send-button { background-color: #007bff; color: white; border: none; padding: 0 25px; border-radius: 25px; cursor: pointer; font-weight: bold; white-space: nowrap; flex-shrink: 0; height: 45px; }
+
 /* Modal */
 #result-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; }
 .modal-content { background-color: white; width: 90%; max-width: 600px; border-radius: 15px; padding: 30px; text-align: center; }
@@ -52,3 +54,74 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-
 #final-grammar { border-color: #28a745; color: #28a745; } #final-vocab { border-color: #17a2b8; color: #17a2b8; }
 .feedback-box { text-align: left; background: #f8f9fa; padding: 15px; border-radius: 8px; max-height: 200px; overflow-y: auto; margin-bottom: 20px; }
 #restart-btn { background-color: #007bff; color: white; border: none; padding: 12px 30px; border-radius: 25px; font-size: 1.1rem; cursor: pointer; }
+
+/* --- MOBIL UYUMLULUK (RESPONSIVE) --- */
+@media screen and (max-width: 768px) {
+    body {
+        padding: 10px;
+        height: auto; /* Mobilde scroll olabilsin */
+        min-height: 100vh;
+    }
+
+    .dashboard-container {
+        gap: 15px;
+    }
+
+    /* Ekip Kartları Mobilde Daha Kompakt */
+    .team-section {
+        gap: 10px;
+    }
+    .team-card {
+        width: 45%; /* İkişerli yan yana */
+        padding: 10px;
+    }
+    .team-avatar {
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+    }
+
+    /* Senaryo Kartları */
+    .mission-grid {
+        grid-template-columns: 1fr; /* Tek sütun */
+    }
+
+    /* Başlat Butonu */
+    #start-simulation-btn {
+        width: 100%;
+        padding: 15px;
+    }
+
+    /* Sohbet Ekranı */
+    #main-wrapper {
+        height: 90vh; /* Mobilde ekranı kapla */
+    }
+    
+    #mission-card {
+        padding: 15px;
+    }
+    
+    /* Mobilde ipuçlarını küçült veya gizle (opsiyonel, şimdilik sıkıştıralım) */
+    .mission-header h3 {
+        font-size: 1rem;
+    }
+
+    /* Input Alanı Düzenlemesi */
+    #input-area {
+        padding: 10px;
+        gap: 5px;
+    }
+    
+    #send-button {
+        padding: 0 15px;
+        font-size: 0; /* Metni gizle */
+    }
+    #send-button::after {
+        content: "➤"; /* Sadece ok ikonu */
+        font-size: 1.2rem;
+    }
+
+    .message-content {
+        max-width: 85%; /* Balonlar daha geniş */
+    }
+}
